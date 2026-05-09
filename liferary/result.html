@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Liferary Result</title>
+    <meta name="description" content="A shared Liferary result page.">
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="icon" href="assets/logo-placeholder.png">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body data-page="result">
+    <a class="skip-link" href="#main" data-i18n="common.skip">Skip to content</a>
+
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Liferary home">
+        <img class="brand-logo" src="assets/logo-placeholder.png" width="40" height="40" alt="">
+        <span class="brand-text">
+          <strong>Liferary</strong>
+          <span>라이프러리</span>
+        </span>
+      </a>
+      <nav class="nav-actions" aria-label="Primary">
+        <label class="visually-hidden" for="languageSelect" data-i18n="nav.language">Language</label>
+        <select id="languageSelect" class="language-select" aria-label="Language">
+          <option value="ko">한국어</option>
+          <option value="en">English</option>
+          <option value="ja">日本語</option>
+          <option value="zh">简体中文</option>
+        </select>
+        <button class="icon-button" id="shareButton" type="button" aria-label="Share result" data-i18n-aria="nav.share">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v14"></path>
+          </svg>
+        </button>
+      </nav>
+    </header>
+
+    <main id="main" class="page-shell">
+      <section class="result-hero" aria-labelledby="resultTitle">
+        <p class="eyebrow" data-i18n="result.eyebrow">Saved reading</p>
+        <h1 id="resultTitle" data-i18n="result.title">Liferary Result</h1>
+        <p class="lede" id="resultIntro" data-i18n="result.loading">Loading the result from the library.</p>
+      </section>
+
+      <div id="resultRoot" class="result-root" hidden></div>
+
+      <section id="notFoundState" class="empty-state" hidden>
+        <h2 data-i18n="result.notFoundTitle">Result not found</h2>
+        <p data-i18n="result.notFoundBody">The ID may be incorrect or the result may have been deleted.</p>
+        <a class="secondary-button inline-link" href="index.html" data-i18n="result.goHome">Return home</a>
+      </section>
+    </main>
+
+    <dialog class="modal" id="deleteModal" aria-labelledby="deleteTitle">
+      <form method="dialog" class="modal-shell">
+        <div class="modal-header">
+          <h2 id="deleteTitle" data-i18n="delete.title">Delete result</h2>
+          <button class="icon-button small" value="cancel" aria-label="Close" data-i18n-aria="common.close" type="submit">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6 6 18"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p data-i18n="delete.body">Enter the deletion password for this result.</p>
+          <label class="field" for="deletePassword">
+            <span data-i18n="form.password">Deletion password</span>
+            <input id="deletePassword" type="password" minlength="4" maxlength="32" autocomplete="off">
+          </label>
+          <p class="field-error" id="deleteError"></p>
+        </div>
+        <div class="modal-actions">
+          <button class="secondary-button" value="cancel" type="submit" data-i18n="common.cancel">Cancel</button>
+          <button class="danger-button" id="confirmDeleteButton" type="button" data-i18n="delete.action">Delete</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="js/config.js"></script>
+    <script type="module" src="js/result.js"></script>
+  </body>
+</html>

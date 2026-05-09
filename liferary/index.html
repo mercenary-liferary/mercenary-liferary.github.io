@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Liferary | Quiet Saju and Four Pillars Birth Chart Library</title>
+    <meta
+      name="description"
+      content="Liferary is a quiet library of destiny for reflective Saju, Four Pillars, Korean fortune, destiny reading, birth chart, 사주, 사주팔자, 만세력, 운세, 운명, 생년월일 운세, 四柱推命, 韓国占い, 運勢, 四柱, 八字, 命理, 运势."
+    >
+    <meta name="robots" content="index,follow">
+    <link rel="canonical" href="https://your-github-username.github.io/mercenary-liferary/liferary/">
+    <link rel="alternate" hreflang="ko" href="https://your-github-username.github.io/mercenary-liferary/liferary/index.html?lang=ko">
+    <link rel="alternate" hreflang="en" href="https://your-github-username.github.io/mercenary-liferary/liferary/index.html?lang=en">
+    <link rel="alternate" hreflang="ja" href="https://your-github-username.github.io/mercenary-liferary/liferary/index.html?lang=ja">
+    <link rel="alternate" hreflang="zh-Hans" href="https://your-github-username.github.io/mercenary-liferary/liferary/index.html?lang=zh">
+    <link rel="alternate" hreflang="x-default" href="https://your-github-username.github.io/mercenary-liferary/liferary/">
+    <meta property="og:title" content="Liferary | Quiet Saju and Four Pillars Birth Chart Library">
+    <meta property="og:description" content="A quiet library of destiny for reflective Saju and Four Pillars birth charts.">
+    <meta property="og:image" content="https://your-github-username.github.io/mercenary-liferary/liferary/assets/og-image.png">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-github-username.github.io/mercenary-liferary/liferary/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Liferary | Quiet Saju and Four Pillars Birth Chart Library">
+    <meta name="twitter:description" content="A quiet library of destiny for reflective Saju and Four Pillars birth charts.">
+    <meta name="twitter:image" content="https://your-github-username.github.io/mercenary-liferary/liferary/assets/og-image.png">
+    <link rel="icon" href="assets/logo-placeholder.png">
+    <link rel="stylesheet" href="css/style.css">
+    <script type="application/ld+json" id="websiteJsonLd">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Liferary",
+        "alternateName": "라이프러리",
+        "url": "https://your-github-username.github.io/mercenary-liferary/liferary/",
+        "description": "A quiet library of destiny for reflective Saju and Four Pillars birth charts.",
+        "inLanguage": ["ko", "en", "ja", "zh-Hans"]
+      }
+    </script>
+  </head>
+  <body data-page="home">
+    <a class="skip-link" href="#main" data-i18n="common.skip">Skip to content</a>
+
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Liferary home">
+        <img class="brand-logo" src="assets/logo-placeholder.png" width="40" height="40" alt="">
+        <span class="brand-text">
+          <strong>Liferary</strong>
+          <span>라이프러리</span>
+        </span>
+      </a>
+      <nav class="nav-actions" aria-label="Primary">
+        <label class="visually-hidden" for="languageSelect" data-i18n="nav.language">Language</label>
+        <select id="languageSelect" class="language-select" aria-label="Language">
+          <option value="ko">한국어</option>
+          <option value="en">English</option>
+          <option value="ja">日本語</option>
+          <option value="zh">简体中文</option>
+        </select>
+        <button class="icon-button" id="openSearchButton" type="button" aria-label="Search result ID" data-i18n-aria="nav.search">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"></path>
+          </svg>
+        </button>
+      </nav>
+    </header>
+
+    <main id="main" class="page-shell">
+      <section class="intro" aria-labelledby="homeTitle">
+        <p class="eyebrow" data-i18n="home.eyebrow">Life + Library</p>
+        <h1 id="homeTitle" data-i18n="home.title">Liferary</h1>
+        <p class="lede" data-i18n="home.subtitle">A quiet library of destiny for reflective Saju and Four Pillars readings.</p>
+      </section>
+
+      <section class="tool-panel" aria-labelledby="formTitle">
+        <div class="panel-heading">
+          <h2 id="formTitle" data-i18n="home.formTitle">Create a Saju result</h2>
+          <p data-i18n="home.formHint">Enter birth information to create a private-by-link result ID.</p>
+        </div>
+
+        <form id="birthForm" class="form-grid" novalidate autocomplete="off">
+          <div class="field">
+            <label for="name" data-i18n="form.name">Name</label>
+            <input id="name" name="name" type="text" minlength="2" maxlength="12" required autocomplete="off">
+            <p class="field-error" id="nameError"></p>
+          </div>
+
+          <div class="field">
+            <label for="gender" data-i18n="form.gender">Gender</label>
+            <select id="gender" name="gender" required>
+              <option value="" data-i18n="form.selectPlaceholder">Select</option>
+              <option value="female" data-i18n="gender.female">Female</option>
+              <option value="male" data-i18n="gender.male">Male</option>
+            </select>
+            <p class="field-error" id="genderError"></p>
+          </div>
+
+          <fieldset class="field fieldset date-fields">
+            <legend data-i18n="form.birthDate">Birth date</legend>
+            <div class="date-inputs">
+              <label>
+                <span data-i18n="form.year">Year</span>
+                <input id="birthYear" name="birthYear" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="1991" required autocomplete="off">
+              </label>
+              <label>
+                <span data-i18n="form.month">Month</span>
+                <input id="birthMonth" name="birthMonth" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="5" required autocomplete="off">
+              </label>
+              <label>
+                <span data-i18n="form.day">Day</span>
+                <input id="birthDay" name="birthDay" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="9" required autocomplete="off">
+              </label>
+            </div>
+            <p class="field-error" id="birthDateError"></p>
+          </fieldset>
+
+          <fieldset class="field fieldset">
+            <legend data-i18n="form.calendarType">Calendar type</legend>
+            <div class="segmented-control" role="radiogroup" aria-label="Calendar type">
+              <label>
+                <input type="radio" name="birthCalendar" value="solar" checked>
+                <span data-i18n="calendar.solar">Solar</span>
+              </label>
+              <label>
+                <input type="radio" name="birthCalendar" value="lunar">
+                <span data-i18n="calendar.lunar">Lunar</span>
+              </label>
+            </div>
+            <label class="checkbox-row subtle-row" id="lunarLeapRow" hidden>
+              <input id="isLunarLeapMonth" name="isLunarLeapMonth" type="checkbox">
+              <span data-i18n="form.lunarLeap">Leap lunar month</span>
+            </label>
+            <p class="field-note" data-i18n="form.lunarNote">Lunar conversion is isolated for future exact Korean calendar data and is not silently approximated.</p>
+            <p class="field-error" id="calendarError"></p>
+          </fieldset>
+
+          <div class="field">
+            <label for="birthTimeBranch" data-i18n="form.birthTime">Birth time branch</label>
+            <select id="birthTimeBranch" name="birthTimeBranch" required></select>
+            <p class="field-note" data-i18n="form.timeNote">Uses the standard 12 two-hour branches. Night-rat-hour and true solar time corrections are future options.</p>
+            <p class="field-error" id="birthTimeBranchError"></p>
+          </div>
+
+          <div class="field">
+            <label for="birthCountry" data-i18n="form.birthCountry">Birth country</label>
+            <select id="birthCountry" name="birthCountry" required></select>
+            <p class="field-note" data-i18n="form.countryNote">For this MVP, country infers an approximate timezone. City and longitude are future improvements.</p>
+            <p class="field-error" id="birthCountryError"></p>
+          </div>
+
+          <div class="field">
+            <label for="password" data-i18n="form.password">Deletion password</label>
+            <input id="password" name="password" type="password" minlength="4" maxlength="32" required autocomplete="off">
+            <p class="field-note" data-i18n="form.passwordNote">Used only when deleting this result.</p>
+            <p class="field-error" id="passwordError"></p>
+          </div>
+
+          <div class="consent-block">
+            <label class="checkbox-row">
+              <input id="privacyConsent" name="privacyConsent" type="checkbox" required>
+              <span data-i18n="form.privacyConsent">I agree to the collection and use of the entered personal information.</span>
+            </label>
+            <button class="text-button" id="openPrivacyButton" type="button" data-i18n="form.viewDetails">View details</button>
+            <label class="checkbox-row">
+              <input id="ageConsent" name="ageConsent" type="checkbox" required>
+              <span data-i18n="form.ageConsent">I am at least 14 years old.</span>
+            </label>
+            <p class="field-error" id="privacyConsentError"></p>
+          </div>
+
+          <div class="form-actions">
+            <button class="primary-button" id="submitButton" type="submit">
+              <span data-i18n="form.submit">Check My Fortune</span>
+            </button>
+            <p class="mode-note" id="storageModeNote"></p>
+          </div>
+        </form>
+      </section>
+
+      <section class="notice-stack" aria-label="Service notices">
+        <p data-i18n="disclaimer.service">This service provides Saju interpretations for entertainment and self-reflection only. It must not be used as a basis for medical, legal, financial, psychological counseling, or professional decisions.</p>
+        <p data-i18n="disclaimer.calculation">This MVP follows defined standard rules, but results may differ from professional Manse calendar systems depending on true solar time, rat-hour handling, birthplace correction, and school-specific standards.</p>
+      </section>
+    </main>
+
+    <dialog class="modal" id="searchModal" aria-labelledby="searchTitle">
+      <form method="dialog" class="modal-shell">
+        <div class="modal-header">
+          <h2 id="searchTitle" data-i18n="search.title">Search by result ID</h2>
+          <button class="icon-button small" value="cancel" aria-label="Close" data-i18n-aria="common.close" type="submit">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6 6 18"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <label class="field" for="searchSlug">
+            <span data-i18n="search.label">Result ID</span>
+            <input id="searchSlug" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" data-i18n-placeholder="search.placeholder" placeholder="48291370">
+          </label>
+          <p class="field-error" id="searchError"></p>
+        </div>
+        <div class="modal-actions">
+          <button class="secondary-button" value="cancel" type="submit" data-i18n="common.cancel">Cancel</button>
+          <button class="primary-button" id="searchSubmitButton" type="button" data-i18n="search.action">Search</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="privacyModal" aria-labelledby="privacyTitle">
+      <form method="dialog" class="modal-shell">
+        <div class="modal-header">
+          <h2 id="privacyTitle" data-i18n="privacy.title">Privacy consent details</h2>
+          <button class="icon-button small" value="cancel" aria-label="Close" data-i18n-aria="common.close" type="submit">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6 6 18"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body prose">
+          <h3 data-i18n="privacy.itemsTitle">Collected items</h3>
+          <p data-i18n="privacy.items">Name, gender, birth date, solar/lunar type, lunar leap month flag, birth time branch, birth country, and deletion password.</p>
+          <h3 data-i18n="privacy.purposeTitle">Purpose</h3>
+          <p data-i18n="privacy.purpose">Generate the Saju result, save and view the shared result page, and verify deletion requests.</p>
+          <h3 data-i18n="privacy.retentionTitle">Retention period</h3>
+          <p data-i18n="privacy.retention">Until the user deletes the result or the service is terminated.</p>
+          <h3 data-i18n="privacy.passwordTitle">Password note</h3>
+          <p data-i18n="privacy.password">The password is used only for deletion verification and should be stored as a hash.</p>
+          <h3 data-i18n="privacy.thirdPartyTitle">Third-party sharing</h3>
+          <p data-i18n="privacy.thirdParty">None.</p>
+          <h3 data-i18n="privacy.refusalTitle">Right to refuse</h3>
+          <p data-i18n="privacy.refusal">You may refuse consent, but result generation is unavailable without it.</p>
+        </div>
+        <div class="modal-actions">
+          <button class="primary-button" value="confirm" type="submit" data-i18n="common.confirm">Confirm</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="js/config.js"></script>
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>
