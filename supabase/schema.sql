@@ -37,14 +37,36 @@ ON saju_results
 FOR INSERT
 WITH CHECK (deleted_at IS NULL);
 
+CREATE OR REPLACE VIEW public_saju_results
+WITH (security_invoker = true)
+AS
+SELECT
+  slug,
+  name,
+  gender,
+  birth_calendar,
+  is_lunar_leap_month,
+  birth_year,
+  birth_month,
+  birth_day,
+  birth_time_branch,
+  birth_country,
+  timezone,
+  result_json,
+  created_at,
+  deleted_at
+FROM saju_results
+WHERE deleted_at IS NULL;
+
 -- No public UPDATE or DELETE policy is created. Soft deletion is handled only
 -- by the Supabase Edge Function using the service role key.
-
--- Column grants keep password_hash out of browser SELECT responses while still
--- allowing anonymous inserts in this MVP. The service role used by Edge
--- Functions bypasses these grants.
+--
+-- Browser clients can INSERT into the source table, but they read only through
+-- public_saju_results, which excludes password_hash.
 REVOKE ALL ON saju_results FROM anon, authenticated;
+REVOKE ALL ON public_saju_results FROM anon, authenticated;
 
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
 GRANT SELECT (
   slug,
   name,
@@ -61,21 +83,7 @@ GRANT SELECT (
   created_at,
   deleted_at
 ) ON saju_results TO anon, authenticated;
-
-GRANT INSERT (
-  slug,
-  name,
-  gender,
-  birth_calendar,
-  is_lunar_leap_month,
-  birth_year,
-  birth_month,
-  birth_day,
-  birth_time_branch,
-  birth_country,
-  timezone,
-  result_json,
-  password_hash
-) ON saju_results TO anon, authenticated;
+GRANT INSERT ON saju_results TO anon, authenticated;
+GRANT SELECT ON public_saju_results TO anon, authenticated;
 
 GRANT USAGE, SELECT ON SEQUENCE saju_results_id_seq TO anon, authenticated;

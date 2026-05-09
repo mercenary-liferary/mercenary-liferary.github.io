@@ -62,15 +62,13 @@ export async function saveResult(payload) {
 
   const { data, error } = await client
     .from("saju_results")
-    .insert(insertRecord)
-    .select(publicColumns())
-    .single();
+    .insert(insertRecord);
 
   if (error) {
     throw new StorageError(error.message, error.code || "SAVE_FAILED");
   }
 
-  return sanitizeRecord(data);
+  return getResultById(payload.slug);
 }
 
 export async function getResultById(slug) {
@@ -87,10 +85,9 @@ export async function getResultById(slug) {
 
   const client = await getSupabaseClient();
   const { data, error } = await client
-    .from("saju_results")
+    .from("public_saju_results")
     .select(publicColumns())
     .eq("slug", normalizedSlug)
-    .is("deleted_at", null)
     .maybeSingle();
 
   if (error) {
