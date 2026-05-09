@@ -3,4 +3,4 @@ Allow: /
 Disallow: /result.html
 Disallow: /*result*
 
-Sitemap: https://your-github-username.github.io/mercenary-liferary/liferary/sitemap.xml
+Sitemap: https://mercenary-liferary.github.io/sitemap.xml

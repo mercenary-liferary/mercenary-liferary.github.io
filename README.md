@@ -19,7 +19,6 @@ No real Supabase keys are included. Never put a Supabase service-role key in fro
 From this folder:
 
 ```bash
-cd liferary
 python3 -m http.server 4173
 ```
 
@@ -39,17 +38,18 @@ npm run test:saju
 
 ## GitHub Pages Deploy
 
-1. Commit the `liferary/` folder.
+1. Commit the app files at the repository root.
 2. In GitHub, open repository settings.
 3. Go to Pages.
-4. Choose the branch and folder that contains this app.
-5. If publishing from the repo root, the app URL will usually be:
+4. Set `Source` to `Deploy from a branch`.
+5. Set `Branch` to `main` and folder to `/root`.
+6. For this repository, the app URL should be:
 
 ```text
-https://YOUR_USERNAME.github.io/YOUR_REPO/liferary/
+https://mercenary-liferary.github.io/
 ```
 
-6. Update these files with your final public URL:
+7. If the GitHub Pages URL changes, update these files with the final public URL:
    - `index.html` canonical, OG, Twitter, and hreflang URLs
    - `robots.txt` sitemap URL
    - `sitemap.xml` homepage URLs
@@ -70,7 +70,7 @@ window.LIFERARY_CONFIG = {
   SUPABASE_URL: "https://YOUR_PROJECT.supabase.co",
   SUPABASE_ANON_KEY: "YOUR_ANON_PUBLIC_KEY",
   DELETE_FUNCTION_URL: "https://YOUR_PROJECT.supabase.co/functions/v1/delete-result",
-  SITE_URL: "https://YOUR_USERNAME.github.io/YOUR_REPO/liferary/"
+  SITE_URL: "https://mercenary-liferary.github.io/"
 };
 ```
 
@@ -78,9 +78,11 @@ The anon key is expected in a public static frontend. The service-role key must 
 
 ## Deploy Delete Edge Function
 
-Install and log in to the Supabase CLI, then run from this folder:
+Install and log in to the Supabase CLI. This repo keeps the draft function in `supabase/edge-functions/delete-result/`; Supabase CLI deploys from `supabase/functions/delete-result/`, so copy it once before deploying:
 
 ```bash
+mkdir -p supabase/functions
+cp -R supabase/edge-functions/delete-result supabase/functions/delete-result
 supabase functions deploy delete-result --project-ref YOUR_PROJECT_REF
 ```
 
