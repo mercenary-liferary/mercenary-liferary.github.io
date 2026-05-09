@@ -57,7 +57,7 @@ function renderResult(record) {
     <section class="result-section" aria-labelledby="summaryTitle">
       <h2 id="summaryTitle">${t("result.summary")}</h2>
       <div class="meta-grid">
-        ${metaItem(t("result.id"), record.slug)}
+        ${metaItem(t("result.id"), record.slug, t("result.rememberId"))}
         ${metaItem(t("result.created"), formatDateTime(record.created_at))}
         ${metaItem(t("result.name"), record.name)}
       </div>
@@ -198,8 +198,14 @@ function renderMeters(counts, prefix) {
   `;
 }
 
-function metaItem(label, value) {
-  return `<div class="meta-item"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`;
+function metaItem(label, value, note = "") {
+  return `
+    <div class="meta-item">
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
+      <small>${escapeHtml(note)}</small>
+    </div>
+  `;
 }
 
 document.getElementById("shareButton").addEventListener("click", async () => {

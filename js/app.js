@@ -48,6 +48,7 @@ async function handleSubmit(event) {
   const validation = validateBirthInput(input, t);
   if (!validation.valid) {
     showErrors(validation.errors);
+    scrollToFirstError(validation.errors);
     return;
   }
 
@@ -93,11 +94,14 @@ function collectFormData() {
 }
 
 function populateTimeBranches() {
-  const selected = birthTimeBranch.value || "zi";
-  birthTimeBranch.innerHTML = EARTHLY_BRANCHES.map((branch) => {
-    return `<option value="${branch.key}">${t(`branch.${branch.animalKey}`)}</option>`;
-  }).join("");
-  birthTimeBranch.value = selected;
+  const selected = birthTimeBranch.value;
+  birthTimeBranch.innerHTML = [
+    `<option value="" disabled>${t("form.birthTimePlaceholder")}</option>`,
+    ...EARTHLY_BRANCHES.map((branch) => {
+      return `<option value="${branch.key}">${t(`branch.${branch.animalKey}`)}</option>`;
+    })
+  ].join("");
+  birthTimeBranch.value = selected || "";
 }
 
 function populateCountries() {
@@ -203,6 +207,23 @@ function setLoading(loading) {
 
 function updateStorageModeNote() {
   storageModeNote.textContent = isMockMode() ? t("common.mockMode") : t("common.supabaseMode");
+}
+
+function scrollToFirstError(errors) {
+  const fieldOrder = [
+    "name",
+    "gender",
+    "birthDate",
+    "calendar",
+    "birthTimeBranch",
+    "birthCountry",
+    "password",
+    "privacyConsent"
+  ];
+  const firstField = fieldOrder.find((field) => errors[field]);
+  const errorNode = firstField ? document.getElementById(`${firstField}Error`) : null;
+  const target = errorNode?.closest(".field, .fieldset, .consent-block") || errorNode;
+  target?.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 function openDialog(dialog) {

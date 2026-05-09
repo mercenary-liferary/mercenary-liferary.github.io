@@ -330,8 +330,22 @@ h3 {
 .field-error {
   min-height: 20px;
   margin: 0;
-  color: var(--danger);
+  color: #ffb4ab;
   font-size: 13px;
+  font-weight: 800;
+}
+
+.field-error:not(:empty) {
+  padding: 8px 10px;
+  border-left: 3px solid #ff8a80;
+  border-radius: 6px;
+  background: rgba(120, 34, 34, 0.22);
+}
+
+.field,
+.fieldset,
+.consent-block {
+  scroll-margin-top: 96px;
 }
 
 .segmented-control {
@@ -575,6 +589,7 @@ h3 {
 .meta-item,
 .summary-item {
   display: grid;
+  grid-template-rows: auto auto 18px;
   gap: 2px;
   min-width: 0;
   padding: 12px;
@@ -594,6 +609,14 @@ h3 {
 .meta-item strong,
 .summary-item strong {
   overflow-wrap: anywhere;
+}
+
+.meta-item small,
+.summary-item small {
+  min-height: 18px;
+  color: var(--faint);
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .pillar-table,
