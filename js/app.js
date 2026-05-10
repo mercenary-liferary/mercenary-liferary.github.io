@@ -1,10 +1,11 @@
 import { bindLanguageSelect, getLanguage, t, translatePage } from "./i18n.js";
 import { COUNTRY_TIMEZONES, EARTHLY_BRANCHES, getCountry } from "./saju/constants.js";
 import { calculateSaju } from "./saju/calculate.js";
-import { clearErrors, digitsOnly, isValidSlug, parseInteger, showErrors, validateBirthInput } from "./validation.js";
-import { generateUniqueSlug, getResultById, isMockMode, saveResult } from "./storage.js";
+import { clearErrors, digitsOnly, isValidLifeId, normalizeLifeId, parseInteger, showErrors, validateBirthInput } from "./validation.js";
+import { getResultById, isMockMode, saveResult } from "./storage.js";
 
 const errorIds = [
+  "lifeIdError",
   "nameError",
   "genderError",
   "birthDateError",
@@ -54,7 +55,13 @@ async function handleSubmit(event) {
 
   setLoading(true);
   try {
-    const slug = await generateUniqueSlug();
+    const slug = normalizeLifeId(input.lifeId);
+    const existingResult = await getResultById(slug);
+    if (existingResult) {
+      showErrors({ lifeId: t("validation.lifeIdTaken") });
+      scrollToFirstError({ lifeId: true });
+      return;
+    }
     const resultJson = calculateSaju(input);
     const country = getCountry(input.birthCountry);
     await saveResult({
@@ -69,6 +76,11 @@ async function handleSubmit(event) {
     url.searchParams.set("lang", getLanguage());
     window.location.href = url.href;
   } catch (error) {
+    if (error?.code === "LIFE_ID_TAKEN") {
+      showErrors({ lifeId: t("validation.lifeIdTaken") });
+      scrollToFirstError({ lifeId: true });
+      return;
+    }
     showToast(error.message || t("common.error"));
   } finally {
     setLoading(false);
@@ -78,6 +90,7 @@ async function handleSubmit(event) {
 function collectFormData() {
   const formData = new FormData(form);
   return {
+    lifeId: normalizeLifeId(formData.get("lifeId")),
     name: String(formData.get("name") || "").trim(),
     gender: String(formData.get("gender") || ""),
     birthYear: parseInteger(formData.get("birthYear")),
@@ -130,10 +143,16 @@ function detectDefaultCountry() {
 }
 
 function installNumericFilters() {
-  ["birthYear", "birthMonth", "birthDay", "searchSlug"].forEach((id) => {
+  ["birthYear", "birthMonth", "birthDay"].forEach((id) => {
     const input = document.getElementById(id);
     input?.addEventListener("input", () => {
       input.value = digitsOnly(input.value);
+    });
+  });
+  ["lifeId", "searchSlug"].forEach((id) => {
+    const input = document.getElementById(id);
+    input?.addEventListener("input", () => {
+      input.value = normalizeLifeId(input.value);
     });
   });
 }
@@ -169,11 +188,11 @@ function installModals() {
 async function handleSearch() {
   const input = document.getElementById("searchSlug");
   const error = document.getElementById("searchError");
-  const slug = digitsOnly(input.value);
+  const slug = normalizeLifeId(input.value);
   input.value = slug;
   error.textContent = "";
 
-  if (!isValidSlug(slug)) {
+  if (!isValidLifeId(slug)) {
     error.textContent = t("search.invalid");
     return;
   }
@@ -211,6 +230,7 @@ function updateStorageModeNote() {
 
 function scrollToFirstError(errors) {
   const fieldOrder = [
+    "lifeId",
     "name",
     "gender",
     "birthDate",

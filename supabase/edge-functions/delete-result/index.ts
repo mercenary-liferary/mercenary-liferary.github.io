@@ -29,10 +29,10 @@ Deno.serve(async (request) => {
     return json({ error: "Invalid JSON" }, 400);
   }
 
-  const slug = String(body.slug || "").trim();
+  const slug = String(body.slug || "").trim().toLowerCase();
   const password = String(body.password || "");
 
-  if (!/^\d{8,10}$/.test(slug) || password.length < 4 || password.length > 32) {
+  if (!/^[a-z0-9_-]{4,24}$/.test(slug) || password.length < 4 || password.length > 32) {
     return json({ error: "Invalid request" }, 400);
   }
 

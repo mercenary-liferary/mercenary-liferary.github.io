@@ -57,7 +57,7 @@
           <option value="ja">日本語</option>
           <option value="zh">简体中文</option>
         </select>
-        <button class="icon-button" id="openSearchButton" type="button" aria-label="Search result ID" data-i18n-aria="nav.search">
+        <button class="icon-button" id="openSearchButton" type="button" aria-label="Search Life ID" data-i18n-aria="nav.search">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="m21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"></path>
           </svg>
@@ -75,10 +75,17 @@
       <section class="tool-panel" aria-labelledby="formTitle">
         <div class="panel-heading">
           <h2 id="formTitle" data-i18n="home.formTitle">Create a Saju result</h2>
-          <p data-i18n="home.formHint">Enter birth information to create a private-by-link result ID.</p>
+          <p data-i18n="home.formHint">Enter a Life ID and birth information to create a private-by-link result.</p>
         </div>
 
         <form id="birthForm" class="form-grid" novalidate autocomplete="off">
+          <div class="field">
+            <label for="lifeId" data-i18n="form.lifeId">Life ID(라이프ID)</label>
+            <input id="lifeId" name="lifeId" type="text" minlength="4" maxlength="24" required autocomplete="off" autocapitalize="none" spellcheck="false" data-i18n-placeholder="form.lifeIdPlaceholder" placeholder="my-life-1991">
+            <p class="field-note" data-i18n="form.lifeIdNote">Use 4-24 lowercase letters, numbers, hyphen, or underscore.</p>
+            <p class="field-error" id="lifeIdError"></p>
+          </div>
+
           <div class="field">
             <label for="name" data-i18n="form.name">Name</label>
             <input id="name" name="name" type="text" minlength="2" maxlength="12" required autocomplete="off">
@@ -149,7 +156,7 @@
           </div>
 
           <div class="field">
-            <label for="password" data-i18n="form.password">Deletion password</label>
+            <label for="password" data-i18n="form.password">Life password (for deletion)</label>
             <input id="password" name="password" type="password" minlength="4" maxlength="32" required autocomplete="off">
             <p class="field-note" data-i18n="form.passwordNote">Used only when deleting this result.</p>
             <p class="field-error" id="passwordError"></p>
@@ -186,7 +193,7 @@
     <dialog class="modal" id="searchModal" aria-labelledby="searchTitle">
       <form method="dialog" class="modal-shell">
         <div class="modal-header">
-          <h2 id="searchTitle" data-i18n="search.title">Search by result ID</h2>
+          <h2 id="searchTitle" data-i18n="search.title">Search by Life ID</h2>
           <button class="icon-button small" value="cancel" aria-label="Close" data-i18n-aria="common.close" type="submit">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M6 6l12 12M18 6 6 18"></path>
@@ -195,8 +202,8 @@
         </div>
         <div class="modal-body">
           <label class="field" for="searchSlug">
-            <span data-i18n="search.label">Result ID</span>
-            <input id="searchSlug" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" data-i18n-placeholder="search.placeholder" placeholder="48291370">
+            <span data-i18n="search.label">Life ID(라이프ID)</span>
+            <input id="searchSlug" type="text" maxlength="24" autocomplete="off" autocapitalize="none" spellcheck="false" data-i18n-placeholder="search.placeholder" placeholder="my-life-1991">
           </label>
           <p class="field-error" id="searchError"></p>
         </div>

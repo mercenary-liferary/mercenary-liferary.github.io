@@ -2,6 +2,7 @@ import { isValidCivilDate } from "./saju/pillars.js";
 
 const YEAR_MIN = 1900;
 const YEAR_MAX = 2050;
+const LIFE_ID_PATTERN = /^[a-z0-9_-]{4,24}$/;
 
 export function digitsOnly(value) {
   return String(value || "").replace(/\D/g, "");
@@ -12,12 +13,20 @@ export function parseInteger(value) {
   return normalized ? Number.parseInt(normalized, 10) : NaN;
 }
 
-export function isValidSlug(value) {
-  return /^\d{8,10}$/.test(String(value || "").trim());
+export function normalizeLifeId(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+export function isValidLifeId(value) {
+  return LIFE_ID_PATTERN.test(normalizeLifeId(value));
 }
 
 export function validateBirthInput(data, t) {
   const errors = {};
+
+  if (!isValidLifeId(data.lifeId)) {
+    errors.lifeId = t("validation.lifeId");
+  }
 
   if (!data.name || data.name.trim().length < 2 || data.name.trim().length > 12) {
     errors.name = t("validation.name");

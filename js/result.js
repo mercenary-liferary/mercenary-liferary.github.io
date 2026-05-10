@@ -1,7 +1,7 @@
 import { bindLanguageSelect, formatDateTime, getLanguage, t, translatePage } from "./i18n.js";
 import { EARTHLY_BRANCHES, getCountryName } from "./saju/constants.js";
 import { deleteResult, getResultById, isMockMode, StorageError } from "./storage.js";
-import { digitsOnly, isValidSlug } from "./validation.js";
+import { isValidLifeId, normalizeLifeId } from "./validation.js";
 
 const languageSelect = document.getElementById("languageSelect");
 const resultRoot = document.getElementById("resultRoot");
@@ -476,8 +476,8 @@ bindLanguageSelect(languageSelect, () => {
 init();
 
 async function init() {
-  currentSlug = digitsOnly(new URLSearchParams(window.location.search).get("id"));
-  if (!isValidSlug(currentSlug)) {
+  currentSlug = normalizeLifeId(new URLSearchParams(window.location.search).get("id"));
+  if (!isValidLifeId(currentSlug)) {
     showNotFound();
     return;
   }

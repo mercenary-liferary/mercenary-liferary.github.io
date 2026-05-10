@@ -4,6 +4,8 @@ Liferary, or 라이프러리, means Life + Library: a quiet library of destiny.
 
 This is a static web app for creating, saving, sharing, searching, and deleting Saju / Four Pillars results. It is designed for GitHub Pages with Supabase as the persistence layer. The service is for entertainment and self-reflection only, not professional advice.
 
+Users choose their own Life ID (`slug`) when creating a result. It must be 4-24 characters using lowercase letters, numbers, hyphen, or underscore, and it is used for later exact search and sharing.
+
 ## Tech Stack
 
 - Static frontend: plain HTML, CSS, and JavaScript ES modules
@@ -55,7 +57,7 @@ https://mercenary-liferary.github.io/
    - `sitemap.xml` homepage URLs
    - `js/config.js` `SITE_URL`
 
-Result pages use `result.html?id=48291370` and include `noindex,nofollow`.
+Result pages use the user-entered Life ID, for example `result.html?id=my-life-1991`, and include `noindex,nofollow`.
 
 ## Supabase Setup
 
@@ -86,18 +88,13 @@ cp -R supabase/edge-functions/delete-result supabase/functions/delete-result
 supabase functions deploy delete-result --project-ref YOUR_PROJECT_REF
 ```
 
-Set the Edge Function secrets:
-
-```bash
-supabase secrets set SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-supabase secrets set SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY
-```
+Do not set secrets whose names start with `SUPABASE_` through the CLI. Supabase reserves those names and provides `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to deployed Edge Functions automatically. If you run the function locally, provide those values in your local function environment only and never commit them.
 
 The function accepts:
 
 ```json
 {
-  "slug": "48291370",
+  "slug": "my-life-1991",
   "password": "user password"
 }
 ```

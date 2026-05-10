@@ -1,3 +1,5 @@
+import { isValidLifeId, normalizeLifeId } from "./validation.js";
+
 const MOCK_PREFIX = "liferary:mock:result:";
 const SUPABASE_CDN = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 const HASH_ITERATIONS = 150_000;
@@ -21,19 +23,15 @@ export function isMockMode() {
   return !isSupabaseConfigured();
 }
 
-export async function generateUniqueSlug() {
-  for (let attempt = 0; attempt < 12; attempt += 1) {
-    const slug = generateRandomNumericSlug();
-    const existing = await getResultById(slug);
-    if (!existing) return slug;
-  }
-  throw new StorageError("Could not generate a unique result ID.", "SLUG_COLLISION");
-}
-
 export async function saveResult(payload) {
+  const slug = normalizeLifeId(payload.slug);
+  if (!isValidLifeId(slug)) {
+    throw new StorageError("Invalid Life ID.", "INVALID_LIFE_ID");
+  }
+
   const passwordHash = await hashPassword(payload.password);
   const record = {
-    slug: payload.slug,
+    slug,
     name: payload.name,
     gender: payload.gender,
     birth_calendar: payload.birthCalendar,
@@ -51,7 +49,7 @@ export async function saveResult(payload) {
   };
 
   if (isMockMode()) {
-    localStorage.setItem(MOCK_PREFIX + payload.slug, JSON.stringify(record));
+    localStorage.setItem(MOCK_PREFIX + slug, JSON.stringify(record));
     return sanitizeRecord(record);
   }
 
@@ -65,15 +63,18 @@ export async function saveResult(payload) {
     .insert(insertRecord);
 
   if (error) {
+    if (error.code === "23505") {
+      throw new StorageError("Life ID already in use.", "LIFE_ID_TAKEN");
+    }
     throw new StorageError(error.message, error.code || "SAVE_FAILED");
   }
 
-  return getResultById(payload.slug);
+  return getResultById(slug);
 }
 
 export async function getResultById(slug) {
-  const normalizedSlug = String(slug || "").trim();
-  if (!/^\d{8,10}$/.test(normalizedSlug)) return null;
+  const normalizedSlug = normalizeLifeId(slug);
+  if (!isValidLifeId(normalizedSlug)) return null;
 
   if (isMockMode()) {
     const raw = localStorage.getItem(MOCK_PREFIX + normalizedSlug);
@@ -98,14 +99,19 @@ export async function getResultById(slug) {
 }
 
 export async function deleteResult(slug, password) {
+  const normalizedSlug = normalizeLifeId(slug);
+  if (!isValidLifeId(normalizedSlug)) {
+    throw new StorageError("Invalid Life ID.", "INVALID_LIFE_ID");
+  }
+
   if (isMockMode()) {
-    const raw = localStorage.getItem(MOCK_PREFIX + slug);
+    const raw = localStorage.getItem(MOCK_PREFIX + normalizedSlug);
     if (!raw) throw new StorageError("Result not found.", "NOT_FOUND");
     const record = JSON.parse(raw);
     const valid = await verifyPassword(password, record.password_hash);
     if (!valid) throw new StorageError("Invalid password.", "INVALID_PASSWORD");
     record.deleted_at = new Date().toISOString();
-    localStorage.setItem(MOCK_PREFIX + slug, JSON.stringify(record));
+    localStorage.setItem(MOCK_PREFIX + normalizedSlug, JSON.stringify(record));
     return true;
   }
 
@@ -118,7 +124,7 @@ export async function deleteResult(slug, password) {
       apikey: config.SUPABASE_ANON_KEY,
       Authorization: `Bearer ${config.SUPABASE_ANON_KEY}`
     },
-    body: JSON.stringify({ slug, password })
+    body: JSON.stringify({ slug: normalizedSlug, password })
   });
 
   if (response.status === 401 || response.status === 403) {
@@ -164,21 +170,6 @@ async function derivePbkdf2(password, salt, iterations) {
     256
   );
   return new Uint8Array(bits);
-}
-
-function generateRandomNumericSlug() {
-  const length = 8 + secureRandomInt(3);
-  let slug = String(1 + secureRandomInt(9));
-  while (slug.length < length) {
-    slug += String(secureRandomInt(10));
-  }
-  return slug;
-}
-
-function secureRandomInt(maxExclusive) {
-  const array = new Uint32Array(1);
-  crypto.getRandomValues(array);
-  return array[0] % maxExclusive;
 }
 
 async function getSupabaseClient() {
