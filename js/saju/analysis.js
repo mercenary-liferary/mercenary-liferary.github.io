@@ -1,7 +1,7 @@
 import { ELEMENTS } from "./constants.js";
 import { determineTenGod } from "./tenGods.js";
 
-const HIDDEN_STEM_WEIGHTS = [0.45, 0.25, 0.15];
+export const HIDDEN_STEM_WEIGHTS = [0.6, 0.3, 0.2];
 const SEASON_ELEMENT = {
   spring: "wood",
   summer: "fire",
@@ -15,7 +15,7 @@ export function buildDerivedAnalysis({ pillars, hiddenStems = {}, tenGods = {}, 
   const monthSeason = pillars.month.branch.season;
   const seasonalElement = SEASON_ELEMENT[monthSeason] || pillars.month.branch.element;
 
-  weightedElementCounts[seasonalElement] += 0.7;
+  weightedElementCounts[seasonalElement] += 1;
   const roundedWeighted = roundCounts(weightedElementCounts);
   const rankedElements = rankCounts(roundedWeighted);
   const tenGodCounts = countTenGods(pillars, hiddenStems, tenGods);
@@ -53,8 +53,9 @@ function countVisibleElements(pillars) {
 function countWeightedElements(pillars, hiddenStems) {
   const counts = Object.fromEntries(ELEMENTS.map((element) => [element, 0]));
   Object.entries(pillars).forEach(([key, pillar]) => {
-    counts[pillar.stem.element] += 1.2;
-    counts[pillar.branch.element] += 0.8;
+    const positionWeight = key === "month" ? 1.15 : 1;
+    counts[pillar.stem.element] += 1 * positionWeight;
+    counts[pillar.branch.element] += 1 * positionWeight;
     (hiddenStems[key] || []).forEach((stem, index) => {
       counts[stem.element] += HIDDEN_STEM_WEIGHTS[index] || 0.1;
     });

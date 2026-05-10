@@ -1,6 +1,6 @@
 import { bindLanguageSelect, formatDateTime, getLanguage, t, translatePage } from "./i18n.js";
 import { EARTHLY_BRANCHES, getCountryName } from "./saju/constants.js";
-import { buildDerivedAnalysis } from "./saju/analysis.js";
+import { buildSajuReport } from "./saju/report.js";
 import { deleteResult, getResultById, isMockMode, StorageError } from "./storage.js";
 import { isValidLifeId, normalizeLifeId } from "./validation.js";
 
@@ -21,11 +21,17 @@ const RESULT_COPY = {
       summary: "요약",
       pillars: "사주 시각 차트",
       balance: "오행과 균형",
-      lifeFlow: "평생 흐름",
-      personality: "성격과 타고난 결",
-      socialLove: "사회와 관계",
-      workMoney: "일과 재물",
-      guidance: "지금의 가이드",
+      lifeOverview: "평생사주 총평",
+      lifePhases: "인생의 시기별 흐름",
+      currentFlow: "지금의 흐름",
+      personality: "성격과 타고난 성향",
+      characterSocial: "타고난 인품과 대인관계",
+      socialWork: "사회운과 일의 방식",
+      moneyFlow: "재물운",
+      loveRomance: "연애와 애정운",
+      healthLifestyle: "건강과 생활 리듬",
+      cautionPoints: "조심해야 할 흐름",
+      useLuckWell: "운을 좋게 쓰는 방법",
       technical: "기술 상세"
     },
     labels: {
@@ -148,11 +154,17 @@ const RESULT_COPY = {
       summary: "Summary",
       pillars: "Four Pillars Visual Chart",
       balance: "Elements & Balance",
-      lifeFlow: "Life Flow",
-      personality: "Personality & Nature",
-      socialLove: "Social Life & Relationships",
-      workMoney: "Work & Money",
-      guidance: "Guidance Now",
+      lifeOverview: "Life Overview",
+      lifePhases: "Life Phases",
+      currentFlow: "Current Flow",
+      personality: "Personality & Natural Disposition",
+      characterSocial: "Character & Social Relationships",
+      socialWork: "Social Luck & Work Style",
+      moneyFlow: "Money Flow",
+      loveRomance: "Love & Romance",
+      healthLifestyle: "Health & Lifestyle Tendency",
+      cautionPoints: "Caution Points",
+      useLuckWell: "How to Use Your Luck Well",
       technical: "Technical Details"
     },
     labels: {
@@ -275,11 +287,17 @@ const RESULT_COPY = {
       summary: "要約",
       pillars: "四柱ビジュアルチャート",
       balance: "五行とバランス",
-      lifeFlow: "人生の流れ",
-      personality: "性格と生まれ持つ質",
-      socialLove: "社会と関係",
-      workMoney: "仕事とお金",
-      guidance: "今のガイダンス",
+      lifeOverview: "人生総評",
+      lifePhases: "人生の時期別の流れ",
+      currentFlow: "現在の流れ",
+      personality: "性格と生まれ持つ傾向",
+      characterSocial: "人柄と対人関係",
+      socialWork: "社会運と仕事の方式",
+      moneyFlow: "金運",
+      loveRomance: "恋愛と愛情運",
+      healthLifestyle: "健康と生活リズム",
+      cautionPoints: "注意すべき流れ",
+      useLuckWell: "運をよく使う方法",
       technical: "技術詳細"
     },
     labels: {
@@ -402,11 +420,17 @@ const RESULT_COPY = {
       summary: "摘要",
       pillars: "四柱视觉图",
       balance: "五行与平衡",
-      lifeFlow: "人生流动",
-      personality: "性格与天性",
-      socialLove: "社会与关系",
-      workMoney: "工作与金钱",
-      guidance: "当前指引",
+      lifeOverview: "人生总评",
+      lifePhases: "人生阶段流动",
+      currentFlow: "当前流动",
+      personality: "性格与天生倾向",
+      characterSocial: "品格与人际关系",
+      socialWork: "社会运与工作方式",
+      moneyFlow: "财物流动",
+      loveRomance: "恋爱与情感",
+      healthLifestyle: "健康与生活节奏",
+      cautionPoints: "需要注意的流动",
+      useLuckWell: "如何善用运势",
       technical: "技术细节"
     },
     labels: {
@@ -557,13 +581,8 @@ function renderResult(record) {
   const result = typeof record.result_json === "string" ? JSON.parse(record.result_json) : record.result_json;
   const lang = getLanguage();
   const copy = getResultCopy(lang);
-  const analysis = result.analysis || buildDerivedAnalysis({
-    pillars: result.pillars,
-    hiddenStems: result.hiddenStems,
-    tenGods: result.tenGods,
-    yinYang: result.yinYang
-  });
-  const narrative = buildNarrative(record, result, analysis, lang);
+  const report = buildSajuReport({ record, result, lang });
+  const { normalizedSaju, finalReport } = report;
   const country = getCountryName(record.birth_country, getLanguage());
   const branch = EARTHLY_BRANCHES.find((item) => item.key === record.birth_time_branch);
 
@@ -578,12 +597,12 @@ function renderResult(record) {
       <div class="meta-grid summary-cards">
         ${metaItem(t("result.id"), record.slug, t("result.rememberId"))}
         ${metaItem(t("result.created"), formatDateTime(record.created_at))}
-        ${metaItem(copy.labels.coreKeywords, narrative.coreKeywords.join(" · "))}
-        ${metaItem(copy.labels.currentLifeTheme, narrative.lifeTheme)}
-        ${metaItem(copy.labels.opportunityAreas, narrative.opportunityAreas.join(" · "))}
-        ${metaItem(copy.labels.cautionAreas, narrative.cautionAreas.join(" · "))}
+        ${metaItem(copy.labels.coreKeywords, finalReport.summaryCard.coreKeywords.join(" · "))}
+        ${metaItem(copy.labels.currentLifeTheme, finalReport.summaryCard.currentLifeTheme)}
+        ${metaItem(copy.labels.opportunityAreas, finalReport.summaryCard.opportunityAreas.join(" · "))}
+        ${metaItem(copy.labels.cautionAreas, finalReport.summaryCard.cautionAreas.join(" · "))}
       </div>
-      <p class="overall-reading">${escapeHtml(narrative.overall)}</p>
+      <p class="overall-reading">${escapeHtml(finalReport.summaryCard.overall)}</p>
       ${isMockMode() ? `<ul class="tag-list" style="margin-top: 14px;"><li>${t("result.mockBadge")}</li></ul>` : ""}
     </section>
 
@@ -597,7 +616,7 @@ function renderResult(record) {
       <div class="balance-grid">
         <div>
           <h3>${escapeHtml(copy.labels.fiveElements)}</h3>
-          ${renderMeters(analysis.weightedElementCounts || result.fiveElements, "element")}
+          ${renderMeters(pickElementCounts(normalizedSaju.fiveElements), "element")}
         </div>
         <div>
           <h3>${escapeHtml(copy.labels.yinYang)}</h3>
@@ -605,35 +624,67 @@ function renderResult(record) {
         </div>
       </div>
       <div class="reading-grid compact">
-        ${textBlock(copy.labels.strongEnergy, narrative.strongEnergy)}
-        ${textBlock(copy.labels.weakEnergy, narrative.weakEnergy)}
-        ${textBlock(copy.labels.balanceAdvice, narrative.balanceAdvice)}
+        ${textBlock(copy.labels.strongEnergy, finalReport.summaryCard.coreKeywords[0])}
+        ${textBlock(copy.labels.weakEnergy, normalizedSaju.fiveElements.weakest.map((item) => t(`element.${item}`)).join(" · "))}
+        ${textBlock(copy.labels.balanceAdvice, finalReport.useLuckWell.practiceMore[0])}
       </div>
     </section>
 
-    <section class="result-section" aria-labelledby="lifeFlowTitle">
-      <h2 id="lifeFlowTitle">${escapeHtml(copy.sections.lifeFlow)}</h2>
-      ${renderReadingBlocks(narrative.lifeFlow)}
+    <section class="result-section" aria-labelledby="lifeOverviewTitle">
+      <h2 id="lifeOverviewTitle">${escapeHtml(copy.sections.lifeOverview)}</h2>
+      ${renderReportParagraphs(finalReport.lifeOverview)}
+    </section>
+
+    <section class="result-section" aria-labelledby="lifePhasesTitle">
+      <h2 id="lifePhasesTitle">${escapeHtml(copy.sections.lifePhases)}</h2>
+      ${renderLifePhases(finalReport.lifePhases)}
+    </section>
+
+    <section class="result-section" aria-labelledby="currentFlowTitle">
+      <h2 id="currentFlowTitle">${escapeHtml(copy.sections.currentFlow)}</h2>
+      ${renderReportParagraphs(finalReport.currentFlow.paragraphs)}
+      ${renderPriorityGrid(finalReport.currentFlow.priorities, copy)}
     </section>
 
     <section class="result-section" aria-labelledby="personalityTitle">
       <h2 id="personalityTitle">${escapeHtml(copy.sections.personality)}</h2>
-      ${renderReadingBlocks(narrative.personality)}
+      ${renderReportParagraphs(finalReport.personality)}
     </section>
 
-    <section class="result-section" aria-labelledby="socialLoveTitle">
-      <h2 id="socialLoveTitle">${escapeHtml(copy.sections.socialLove)}</h2>
-      ${renderReadingBlocks(narrative.socialLove)}
+    <section class="result-section" aria-labelledby="characterSocialTitle">
+      <h2 id="characterSocialTitle">${escapeHtml(copy.sections.characterSocial)}</h2>
+      ${renderReportParagraphs(finalReport.characterSocial)}
     </section>
 
-    <section class="result-section" aria-labelledby="workMoneyTitle">
-      <h2 id="workMoneyTitle">${escapeHtml(copy.sections.workMoney)}</h2>
-      ${renderReadingBlocks(narrative.workMoney)}
+    <section class="result-section" aria-labelledby="socialWorkTitle">
+      <h2 id="socialWorkTitle">${escapeHtml(copy.sections.socialWork)}</h2>
+      ${renderReportParagraphs(finalReport.socialWork)}
     </section>
 
-    <section class="result-section" aria-labelledby="guidanceTitle">
-      <h2 id="guidanceTitle">${escapeHtml(copy.sections.guidance)}</h2>
-      ${renderReadingBlocks(narrative.guidance)}
+    <section class="result-section" aria-labelledby="moneyFlowTitle">
+      <h2 id="moneyFlowTitle">${escapeHtml(copy.sections.moneyFlow)}</h2>
+      ${renderReportParagraphs(finalReport.moneyFlow.paragraphs)}
+      ${tagGroup(copy.labels.balanceRecoveryActions, finalReport.moneyFlow.habits)}
+    </section>
+
+    <section class="result-section" aria-labelledby="loveRomanceTitle">
+      <h2 id="loveRomanceTitle">${escapeHtml(copy.sections.loveRomance)}</h2>
+      ${renderReportParagraphs(finalReport.loveRomance)}
+    </section>
+
+    <section class="result-section" aria-labelledby="healthLifestyleTitle">
+      <h2 id="healthLifestyleTitle">${escapeHtml(copy.sections.healthLifestyle)}</h2>
+      ${renderReportParagraphs(finalReport.healthLifestyle)}
+    </section>
+
+    <section class="result-section" aria-labelledby="cautionPointsTitle">
+      <h2 id="cautionPointsTitle">${escapeHtml(copy.sections.cautionPoints)}</h2>
+      ${renderChecklist(finalReport.cautionPoints)}
+    </section>
+
+    <section class="result-section" aria-labelledby="useLuckWellTitle">
+      <h2 id="useLuckWellTitle">${escapeHtml(copy.sections.useLuckWell)}</h2>
+      ${renderGuidanceGroups(finalReport.useLuckWell)}
     </section>
 
     <section class="result-section" aria-labelledby="technicalTitle">
@@ -647,7 +698,13 @@ function renderResult(record) {
               ${metaItem(t("result.birth"), `${record.birth_year}-${pad(record.birth_month)}-${pad(record.birth_day)} · ${branch?.han || ""}${branch?.ko || ""}`)}
               ${metaItem(t("result.calendar"), t(`calendar.${record.birth_calendar}`))}
               ${metaItem(t("result.country"), `${country} · ${record.timezone}`)}
+              ${metaItem(copy.labels.dayMaster, `${result.dayMaster.han}${result.dayMaster.ko} · ${t(`element.${normalizedSaju.dayMaster.element}`)} · ${normalizedSaju.dayMaster.strengthLevel}`)}
+              ${metaItem(copy.labels.currentPhase, `${normalizedSaju.currentYearFlow.pillar.han}${normalizedSaju.currentYearFlow.pillar.ko} · ${normalizedSaju.currentYearFlow.annualTenGod}`)}
             </div>
+          </div>
+          <div>
+            <h3>${escapeHtml(copy.labels.fiveElements)}</h3>
+            ${renderMeters(pickElementCounts(normalizedSaju.fiveElements), "element")}
           </div>
           <div>
             <h3>${escapeHtml(copy.labels.rawFourPillars)}</h3>
@@ -656,6 +713,7 @@ function renderResult(record) {
           <div>
             <h3>${escapeHtml(copy.labels.tenGods)}</h3>
             ${renderTenGodTags(result)}
+            ${renderTenGodGroupTable(normalizedSaju.tenGodGroups)}
           </div>
           <div>
             <h3>${escapeHtml(copy.labels.hiddenStems)}</h3>
@@ -670,12 +728,11 @@ function renderResult(record) {
             <h3>${escapeHtml(copy.labels.assumptions)}</h3>
             <ul class="tag-list">
               ${result.warnings.map((warning) => `<li>${escapeHtml(warning)}</li>`).join("")}
-              <li>${escapeHtml(analysis.methodNote || "")}</li>
+              <li>${escapeHtml(normalizedSaju.source.analysisMethod || "")}</li>
             </ul>
           </div>
           <div class="notice-stack">
-            <p>${t("disclaimer.service")}</p>
-            <p>${t("disclaimer.calculation")}</p>
+            ${finalReport.disclaimers.map((item) => `<p>${escapeHtml(item)}</p>`).join("")}
           </div>
         </div>
       </details>
@@ -788,6 +845,94 @@ function renderLuckTable(luckPillars) {
       </tbody>
     </table>
   `;
+}
+
+function renderReportParagraphs(items) {
+  return `
+    <div class="report-prose">
+      ${items.map((item) => `<p>${escapeHtml(typeof item === "string" ? item : item.text)}</p>`).join("")}
+    </div>
+  `;
+}
+
+function renderLifePhases(phases) {
+  return `
+    <div class="phase-grid">
+      ${["early", "middle", "later"].map((key) => {
+        const phase = phases[key];
+        return `
+          <article class="phase-card">
+            <h3>${escapeHtml(phase.title)}</h3>
+            <p class="field-note">${escapeHtml(phase.ageRange)} · ${escapeHtml(phase.yearRange)}</p>
+            ${renderReportParagraphs(phase.paragraphs)}
+          </article>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderPriorityGrid(priorities, copy) {
+  return `
+    <div class="reading-grid compact">
+      ${textBlock(copy.labels.relationshipPriority, priorities.relationship)}
+      ${textBlock(copy.labels.workPriority, priorities.work)}
+      ${textBlock(copy.labels.moneyPriority, priorities.money)}
+    </div>
+  `;
+}
+
+function renderChecklist(items) {
+  return `<ul class="check-list report-checklist">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+}
+
+function renderGuidanceGroups(groups) {
+  const titles = {
+    practiceMore: "더 연습할 것",
+    reduce: "줄일 것",
+    chooseEnvironment: "선택하면 좋은 환경",
+    stayCloseTo: "가까이 두면 좋은 사람",
+    decisionCriteria: "결정 기준"
+  };
+  return `
+    <div class="reading-grid">
+      ${Object.entries(groups).map(([key, items]) => textBlock(titles[key] || key, items)).join("")}
+    </div>
+  `;
+}
+
+function renderTenGodGroupTable(groups) {
+  const labels = {
+    peer: "Peer",
+    expression: "Expression",
+    wealth: "Wealth",
+    authority: "Authority",
+    resource: "Resource"
+  };
+  return `
+    <table class="luck-table" style="margin-top: 14px;">
+      <thead>
+        <tr>
+          <th>Group</th>
+          <th>Score</th>
+          <th>Level</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${Object.entries(groups).map(([key, value]) => `
+          <tr>
+            <td>${escapeHtml(labels[key] || key)}</td>
+            <td>${escapeHtml(value.score)}</td>
+            <td>${escapeHtml(value.level)}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+function pickElementCounts(fiveElements) {
+  return Object.fromEntries(["wood", "fire", "earth", "metal", "water"].map((key) => [key, fiveElements[key] || 0]));
 }
 
 function renderReadingBlocks(blocks) {

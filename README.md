@@ -134,6 +134,8 @@ The engine is modular under `js/saju/`.
 - `tenGods.js`: basic Ten Gods relation logic
 - `hiddenStems.js`: hidden stem table
 - `luckPillars.js`: MVP Daewoon structure
+- `analysis.js`: weighted helper analysis using visible elements, hidden stems, and month-season emphasis
+- `report.js`: normalized Saju, interpretation profile, and long-form report generation
 - `interpreters.js`: localized reflective reading templates
 - `calculate.js`: orchestration and sample validation output
 
@@ -147,6 +149,8 @@ Implemented formulas:
 - Day pillar uses deterministic civil-day math with `2000-01-01 = 戊午`.
 - Hour branch is selected by the user.
 - Hour stem: `mod((dayStemIndex % 5) * 2 + hourBranchIndex, 10)`.
+- Result reports are generated through `raw calculation -> normalizedSaju -> interpretationProfile -> finalReport`.
+- The main report translates Day Master, Five Elements, Yin/Yang, Ten God groups, hidden stems, Luck Pillars, and current annual flow into practical language.
 
 Sample year-pillar checks:
 

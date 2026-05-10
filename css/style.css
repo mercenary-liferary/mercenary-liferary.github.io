@@ -819,6 +819,37 @@ h3 {
   gap: 12px;
 }
 
+.report-prose {
+  display: grid;
+  gap: 14px;
+  color: var(--muted);
+}
+
+.report-prose p {
+  margin: 0;
+}
+
+.phase-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.phase-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+
+.phase-card:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.phase-card h3 {
+  margin: 0;
+}
+
 .reading-grid.compact {
   margin-top: 18px;
 }
@@ -844,6 +875,10 @@ h3 {
   padding-left: 18px;
   margin: 0;
   color: var(--muted);
+}
+
+.report-checklist {
+  gap: 10px;
 }
 
 .tag-row-group {
