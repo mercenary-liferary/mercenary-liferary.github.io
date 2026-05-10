@@ -619,6 +619,127 @@ h3 {
   line-height: 1.35;
 }
 
+.overall-reading {
+  margin: 14px 0 0;
+  padding: 14px;
+  border-left: 3px solid var(--accent-soft);
+  border-radius: var(--radius);
+  background: #141718;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.pillar-chart {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.pillar-stack {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pillar-stack h3 {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.character-card {
+  --element-bg: #171a1b;
+  --element-border: var(--line);
+  --element-accent: var(--accent-soft);
+  position: relative;
+  display: grid;
+  gap: 4px;
+  min-height: 118px;
+  padding: 14px;
+  border: 1px solid var(--element-border);
+  border-radius: var(--radius);
+  background: var(--element-bg);
+  box-shadow: inset 3px 0 0 var(--element-accent);
+}
+
+.character-card strong {
+  color: var(--text);
+  font-size: 42px;
+  line-height: 1;
+}
+
+.character-card span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.character-card .character-label {
+  color: var(--faint);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.character-card em {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 3px 7px;
+  border: 1px solid var(--element-border);
+  border-radius: 999px;
+  color: var(--element-accent);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.day-master {
+  border-width: 2px;
+  box-shadow: inset 4px 0 0 var(--element-accent), 0 0 0 1px rgba(216, 216, 210, 0.12);
+}
+
+.element-wood {
+  --element-bg: #16201a;
+  --element-border: #3d6550;
+  --element-accent: #8db99b;
+}
+
+.element-fire {
+  --element-bg: #241817;
+  --element-border: #7b4b45;
+  --element-accent: #d29a8b;
+}
+
+.element-earth {
+  --element-bg: #211d16;
+  --element-border: #6f6144;
+  --element-accent: #c1af82;
+}
+
+.element-metal {
+  --element-bg: #1b1d1d;
+  --element-border: #697071;
+  --element-accent: #d8d8d2;
+}
+
+.element-water {
+  --element-bg: #151c22;
+  --element-border: #3f5f76;
+  --element-accent: #8fb2c8;
+}
+
+.balance-grid {
+  display: grid;
+  gap: 22px;
+}
+
+.balance-grid h3,
+.tag-group h3,
+.technical-stack h3 {
+  color: var(--text);
+  font-size: 15px;
+}
+
 .pillar-table,
 .luck-table {
   width: 100%;
@@ -698,6 +819,10 @@ h3 {
   gap: 12px;
 }
 
+.reading-grid.compact {
+  margin-top: 18px;
+}
+
 .reading-item {
   padding: 14px 0;
   border-top: 1px solid var(--line);
@@ -711,6 +836,20 @@ h3 {
 .reading-item p {
   margin-bottom: 0;
   color: var(--muted);
+}
+
+.check-list {
+  display: grid;
+  gap: 6px;
+  padding-left: 18px;
+  margin: 0;
+  color: var(--muted);
+}
+
+.tag-row-group {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
 }
 
 .tag-list {
@@ -728,6 +867,61 @@ h3 {
   border-radius: 999px;
   color: var(--muted);
   font-size: 13px;
+}
+
+.timeline {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding-left: 14px;
+  border-left: 1px solid var(--line-strong);
+}
+
+.timeline-item {
+  position: relative;
+  display: grid;
+  gap: 3px;
+  padding: 0 0 12px 14px;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: -19px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--accent-soft);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.timeline-item span {
+  color: var(--faint);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.timeline-item strong {
+  color: var(--text);
+}
+
+.timeline-item p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.technical-details summary {
+  cursor: pointer;
+  color: var(--text);
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.technical-stack {
+  display: grid;
+  gap: 22px;
+  margin-top: 18px;
 }
 
 .empty-state {
@@ -776,6 +970,19 @@ h3 {
   .meta-grid,
   .summary-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .summary-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pillar-chart {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .balance-grid,
+  .tag-row-group {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .reading-grid {
