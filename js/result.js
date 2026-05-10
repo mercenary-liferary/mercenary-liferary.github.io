@@ -15,6 +15,149 @@ const deleteError = document.getElementById("deleteError");
 let currentRecord = null;
 let currentSlug = "";
 
+const TECH_COPY = {
+  ko: {
+    guidance: {
+      practiceMore: "더 연습할 것",
+      reduce: "줄일 것",
+      chooseEnvironment: "선택하면 좋은 환경",
+      stayCloseTo: "가까이 두면 좋은 사람",
+      decisionCriteria: "결정 기준"
+    },
+    table: {
+      group: "그룹",
+      score: "점수",
+      level: "수준",
+      peer: "자기/동료",
+      expression: "표현",
+      wealth: "재물",
+      authority: "책임",
+      resource: "학습",
+      low: "낮음",
+      medium: "보통",
+      high: "강함",
+      excessive: "과함",
+      weak: "약함",
+      moderatelyWeak: "다소 약함",
+      balanced: "균형",
+      moderatelyStrong: "다소 강함",
+      strong: "강함"
+    },
+    notes: {
+      luck: "대운 시작 나이는 근사 절기와 선택한 시간지의 대표 시각을 기준으로 계산됩니다.",
+      analysis: "가중 오행 분석은 지장간의 낮은 가중치와 월지 계절 가중치를 반영한 MVP 해석 보조 모델입니다. 공인 만세력 강약 판정 모델은 아닙니다.",
+      solar: "MVP 절기는 고정 근사 날짜 00:00을 사용합니다. 만세력 수준의 정밀도를 주장하기 전 1900-2050년 정확한 현지 절기 시각표로 교체해야 합니다.",
+      dayBase: "일주는 2000-01-01 = 戊午 기준으로 결정론적으로 계산하지만, 운영 전 여러 만세력 샘플로 추가 검증이 필요합니다.",
+      timezone: "국가 단위 시간대는 근사값입니다. 정확한 사주는 출생 도시, 경도, 과거 시간대 규칙, 진태양시, 야자시/조자시 처리가 필요할 수 있습니다."
+    }
+  },
+  en: {
+    guidance: {
+      practiceMore: "Practice more",
+      reduce: "Reduce",
+      chooseEnvironment: "Helpful environments",
+      stayCloseTo: "People to keep close",
+      decisionCriteria: "Decision criteria"
+    },
+    table: {
+      group: "Group",
+      score: "Score",
+      level: "Level",
+      peer: "Peer",
+      expression: "Expression",
+      wealth: "Wealth",
+      authority: "Authority",
+      resource: "Resource",
+      low: "Low",
+      medium: "Medium",
+      high: "High",
+      excessive: "Excessive",
+      weak: "Weak",
+      moderatelyWeak: "Moderately weak",
+      balanced: "Balanced",
+      moderatelyStrong: "Moderately strong",
+      strong: "Strong"
+    },
+    notes: {
+      luck: "Luck pillar start age uses approximate fixed solar terms and a representative hour for the selected time branch.",
+      analysis: "Weighted element analysis adds small hidden-stem weights and a month-season emphasis. It is an MVP interpretive aid, not a certified Manse-calendar strength model.",
+      solar: "MVP solar terms use fixed approximate local dates at 00:00. Replace them with exact local solar-term datetimes for 1900-2050 before claiming Manse-calendar precision.",
+      dayBase: "The day pillar uses 2000-01-01 = 戊午 as a deterministic base date, but it should be verified against multiple Manse-calendar samples before production use.",
+      timezone: "Country-level timezone is approximate. Accurate Saju may require birth city, longitude, historical timezone rules, true solar time, and night-rat-hour handling."
+    }
+  },
+  ja: {
+    guidance: {
+      practiceMore: "もっと練習すること",
+      reduce: "減らすこと",
+      chooseEnvironment: "選ぶとよい環境",
+      stayCloseTo: "近くに置きたい人",
+      decisionCriteria: "判断基準"
+    },
+    table: {
+      group: "グループ",
+      score: "点数",
+      level: "水準",
+      peer: "自己/仲間",
+      expression: "表現",
+      wealth: "財",
+      authority: "責任",
+      resource: "学習",
+      low: "低い",
+      medium: "普通",
+      high: "強い",
+      excessive: "過多",
+      weak: "弱い",
+      moderatelyWeak: "やや弱い",
+      balanced: "均衡",
+      moderatelyStrong: "やや強い",
+      strong: "強い"
+    },
+    notes: {
+      luck: "大運の開始年齢は近似節気と選択した時間支の代表時刻を基準に計算されます。",
+      analysis: "加重五行分析は蔵干の低い重みと月支の季節重みを反映したMVP解釈補助モデルです。公認万年暦の強弱判定モデルではありません。",
+      solar: "MVPの節気は固定近似日付の00:00を使用します。万年暦水準の精度を示す前に、1900-2050年の正確な現地節気時刻表へ置き換える必要があります。",
+      dayBase: "日柱は2000-01-01 = 戊午を決定論的な基準日として計算しますが、本番前に複数の万年暦サンプルで検証が必要です。",
+      timezone: "国単位のタイムゾーンは近似です。正確な四柱推命には出生都市、経度、過去の時差規則、真太陽時、夜子時処理が必要になる場合があります。"
+    }
+  },
+  zh: {
+    guidance: {
+      practiceMore: "多练习",
+      reduce: "减少",
+      chooseEnvironment: "适合选择的环境",
+      stayCloseTo: "适合亲近的人",
+      decisionCriteria: "判断标准"
+    },
+    table: {
+      group: "组别",
+      score: "分数",
+      level: "水平",
+      peer: "自我/同伴",
+      expression: "表达",
+      wealth: "财",
+      authority: "责任",
+      resource: "学习",
+      low: "低",
+      medium: "中",
+      high: "强",
+      excessive: "过强",
+      weak: "弱",
+      moderatelyWeak: "稍弱",
+      balanced: "平衡",
+      moderatelyStrong: "稍强",
+      strong: "强"
+    },
+    notes: {
+      luck: "大运起始年龄使用近似固定节气和所选时辰的代表时间计算。",
+      analysis: "加权五行分析加入了藏干的小权重和月令季节权重，是MVP解释辅助模型，并非认证万年历强弱模型。",
+      solar: "MVP节气使用固定近似本地日期00:00。若要声称万年历级精度，应替换为1900-2050年的精确本地节气时间表。",
+      dayBase: "日柱以2000-01-01 = 戊午作为确定性基准日计算，但上线前应与多个万年历样本核验。",
+      timezone: "国家级时区是近似值。准确四柱可能需要出生城市、经度、历史时区规则、真太阳时和夜子时处理。"
+    }
+  }
+};
+
 const RESULT_COPY = {
   ko: {
     sections: {
@@ -698,8 +841,8 @@ function renderResult(record) {
               ${metaItem(t("result.birth"), `${record.birth_year}-${pad(record.birth_month)}-${pad(record.birth_day)} · ${branch?.han || ""}${branch?.ko || ""}`)}
               ${metaItem(t("result.calendar"), t(`calendar.${record.birth_calendar}`))}
               ${metaItem(t("result.country"), `${country} · ${record.timezone}`)}
-              ${metaItem(copy.labels.dayMaster, `${result.dayMaster.han}${result.dayMaster.ko} · ${t(`element.${normalizedSaju.dayMaster.element}`)} · ${normalizedSaju.dayMaster.strengthLevel}`)}
-              ${metaItem(copy.labels.currentPhase, `${normalizedSaju.currentYearFlow.pillar.han}${normalizedSaju.currentYearFlow.pillar.ko} · ${normalizedSaju.currentYearFlow.annualTenGod}`)}
+              ${metaItem(copy.labels.dayMaster, `${result.dayMaster.han}${result.dayMaster.ko} · ${t(`element.${normalizedSaju.dayMaster.element}`)} · ${technicalLabel(normalizedSaju.dayMaster.strengthLevel)}`)}
+              ${metaItem(copy.labels.currentPhase, `${normalizedSaju.currentYearFlow.pillar.han}${normalizedSaju.currentYearFlow.pillar.ko} · ${t(`tenGod.${normalizedSaju.currentYearFlow.annualTenGod}`)}`)}
             </div>
           </div>
           <div>
@@ -721,14 +864,14 @@ function renderResult(record) {
           </div>
           <div>
             <h3>${escapeHtml(copy.labels.luckPillars)}</h3>
-            <p class="field-note">${escapeHtml(t(`direction.${result.luckPillars.direction}`))} · ${escapeHtml(result.luckPillars.startAge.years)}y ${escapeHtml(result.luckPillars.startAge.months)}m · ${escapeHtml(result.luckPillars.note)}</p>
+            <p class="field-note">${escapeHtml(t(`direction.${result.luckPillars.direction}`))} · ${escapeHtml(formatLuckStartAge(result.luckPillars.startAge))} · ${escapeHtml(localizeTechnicalNote(result.luckPillars.note))}</p>
             ${renderLuckTable(result.luckPillars)}
           </div>
           <div>
             <h3>${escapeHtml(copy.labels.assumptions)}</h3>
             <ul class="tag-list">
-              ${result.warnings.map((warning) => `<li>${escapeHtml(warning)}</li>`).join("")}
-              <li>${escapeHtml(normalizedSaju.source.analysisMethod || "")}</li>
+              ${result.warnings.map((warning) => `<li>${escapeHtml(localizeTechnicalNote(warning))}</li>`).join("")}
+              <li>${escapeHtml(localizeTechnicalNote(normalizedSaju.source.analysisMethod || ""))}</li>
             </ul>
           </div>
           <div class="notice-stack">
@@ -887,13 +1030,7 @@ function renderChecklist(items) {
 }
 
 function renderGuidanceGroups(groups) {
-  const titles = {
-    practiceMore: "더 연습할 것",
-    reduce: "줄일 것",
-    chooseEnvironment: "선택하면 좋은 환경",
-    stayCloseTo: "가까이 두면 좋은 사람",
-    decisionCriteria: "결정 기준"
-  };
+  const titles = getTechnicalCopy().guidance;
   return `
     <div class="reading-grid">
       ${Object.entries(groups).map(([key, items]) => textBlock(titles[key] || key, items)).join("")}
@@ -902,20 +1039,14 @@ function renderGuidanceGroups(groups) {
 }
 
 function renderTenGodGroupTable(groups) {
-  const labels = {
-    peer: "Peer",
-    expression: "Expression",
-    wealth: "Wealth",
-    authority: "Authority",
-    resource: "Resource"
-  };
+  const labels = getTechnicalCopy().table;
   return `
     <table class="luck-table" style="margin-top: 14px;">
       <thead>
         <tr>
-          <th>Group</th>
-          <th>Score</th>
-          <th>Level</th>
+          <th>${escapeHtml(labels.group)}</th>
+          <th>${escapeHtml(labels.score)}</th>
+          <th>${escapeHtml(labels.level)}</th>
         </tr>
       </thead>
       <tbody>
@@ -923,12 +1054,40 @@ function renderTenGodGroupTable(groups) {
           <tr>
             <td>${escapeHtml(labels[key] || key)}</td>
             <td>${escapeHtml(value.score)}</td>
-            <td>${escapeHtml(value.level)}</td>
+            <td>${escapeHtml(labels[value.level] || value.level)}</td>
           </tr>
         `).join("")}
       </tbody>
     </table>
   `;
+}
+
+function getTechnicalCopy() {
+  return TECH_COPY[getLanguage()] || TECH_COPY.en;
+}
+
+function technicalLabel(key) {
+  return getTechnicalCopy().table[key] || key;
+}
+
+function formatLuckStartAge(startAge) {
+  const lang = getLanguage();
+  const years = startAge?.years ?? 0;
+  const months = startAge?.months ?? 0;
+  if (lang === "ko") return `${years}년 ${months}개월`;
+  if (lang === "ja") return `${years}年 ${months}か月`;
+  if (lang === "zh") return `${years}年 ${months}个月`;
+  return `${years}y ${months}m`;
+}
+
+function localizeTechnicalNote(note) {
+  const notes = getTechnicalCopy().notes;
+  if (note.includes("Start age uses approximate fixed solar terms")) return notes.luck;
+  if (note.includes("Weighted element analysis adds small hidden-stem weights")) return notes.analysis;
+  if (note.includes("MVP solar terms use fixed approximate local dates")) return notes.solar;
+  if (note.includes("Day pillar base date 2000-01-01 = 戊午")) return notes.dayBase;
+  if (note.includes("Country-level timezone is approximate")) return notes.timezone;
+  return note;
 }
 
 function pickElementCounts(fiveElements) {
