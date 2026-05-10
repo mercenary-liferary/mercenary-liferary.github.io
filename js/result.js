@@ -1,5 +1,6 @@
 import { bindLanguageSelect, formatDateTime, getLanguage, t, translatePage } from "./i18n.js";
 import { EARTHLY_BRANCHES, getCountryName } from "./saju/constants.js";
+import { buildDerivedAnalysis } from "./saju/analysis.js";
 import { deleteResult, getResultById, isMockMode, StorageError } from "./storage.js";
 import { isValidLifeId, normalizeLifeId } from "./validation.js";
 
@@ -19,14 +20,12 @@ const RESULT_COPY = {
     sections: {
       summary: "요약",
       pillars: "사주 시각 차트",
-      balance: "균형",
-      personality: "성향",
-      past: "과거 패턴",
-      current: "현재 흐름",
-      future: "미래 전망",
-      relationships: "관계",
-      workMoney: "일과 돈",
-      guidance: "가이드",
+      balance: "오행과 균형",
+      lifeFlow: "평생 흐름",
+      personality: "성격과 타고난 결",
+      socialLove: "사회와 관계",
+      workMoney: "일과 재물",
+      guidance: "지금의 가이드",
       technical: "기술 상세"
     },
     labels: {
@@ -39,10 +38,18 @@ const RESULT_COPY = {
       strongEnergy: "강한 기운",
       weakEnergy: "약한 기운",
       balanceAdvice: "균형 조언",
+      lifelongOverview: "평생사주 총평",
+      earlyYears: "초년운",
+      middleYears: "중년운",
+      laterYears: "말년운",
+      currentFlow: "현재 흐름",
+      futureFlow: "앞으로의 흐름",
       heavenlyStem: "천간",
       earthlyBranch: "지지",
       dayMaster: "일간",
       basicPersonality: "기본 성향",
+      innateNature: "타고난 성향",
+      naturalCharacter: "타고난 인품",
       strengths: "강점",
       vulnerabilities: "취약점",
       thinkingStyle: "사고 방식",
@@ -53,6 +60,8 @@ const RESULT_COPY = {
       relationshipPatterns: "관계 패턴",
       workStudyPatterns: "일/학습 패턴",
       selfCheckQuestions: "셀프 체크 질문",
+      socialLuck: "사회운",
+      socialPersonality: "사회적 성격",
       currentPhase: "현재 단계",
       whatToFocusOn: "집중할 것",
       whatToAvoid: "피할 것",
@@ -70,19 +79,25 @@ const RESULT_COPY = {
       thisYear: "올해",
       relationshipStyle: "관계 스타일",
       loveStyle: "애정 스타일",
+      affectionLuck: "이성·애정운",
       matchingPeople: "잘 맞는 사람",
       conflictPronePeople: "충돌하기 쉬운 사람",
       longTermAdvice: "장기 관계 조언",
+      workAptitude: "사회·직업 적성",
       workStyle: "일하는 방식",
       suitableEnvironment: "맞는 환경",
       roleStrengths: "역할 강점",
+      moneyLuck: "재물운",
       moneyMakingStyle: "돈을 만드는 방식",
+      moneyProtection: "재물 손실을 줄이는 법",
+      moneyStrategy: "재물 모으는 법",
       moneyManagementCaution: "돈 관리 주의점",
       whatToDoNow: "지금 할 일",
       whatToAvoidNow: "지금 피할 일",
       relationshipGuidance: "관계 가이드",
       workGuidance: "일 가이드",
       moneyGuidance: "돈 가이드",
+      lifeRhythm: "컨디션·생활 리듬",
       balanceRecoveryActions: "균형 회복 행동",
       profile: "프로필",
       rawFourPillars: "원자료 사주표",
@@ -132,14 +147,12 @@ const RESULT_COPY = {
     sections: {
       summary: "Summary",
       pillars: "Four Pillars Visual Chart",
-      balance: "Balance",
-      personality: "Personality",
-      past: "Past Patterns",
-      current: "Current Flow",
-      future: "Future Outlook",
-      relationships: "Relationships",
+      balance: "Elements & Balance",
+      lifeFlow: "Life Flow",
+      personality: "Personality & Nature",
+      socialLove: "Social Life & Relationships",
       workMoney: "Work & Money",
-      guidance: "Guidance",
+      guidance: "Guidance Now",
       technical: "Technical Details"
     },
     labels: {
@@ -152,10 +165,18 @@ const RESULT_COPY = {
       strongEnergy: "Strong energy",
       weakEnergy: "Weak energy",
       balanceAdvice: "Balance advice",
+      lifelongOverview: "Lifetime overview",
+      earlyYears: "Early years",
+      middleYears: "Middle years",
+      laterYears: "Later years",
+      currentFlow: "Current flow",
+      futureFlow: "Future flow",
       heavenlyStem: "Heavenly Stem",
       earthlyBranch: "Earthly Branch",
       dayMaster: "Day Master",
       basicPersonality: "Basic personality",
+      innateNature: "Innate nature",
+      naturalCharacter: "Natural character",
       strengths: "Strengths",
       vulnerabilities: "Vulnerabilities",
       thinkingStyle: "Thinking style",
@@ -166,6 +187,8 @@ const RESULT_COPY = {
       relationshipPatterns: "Relationship patterns",
       workStudyPatterns: "Work/study patterns",
       selfCheckQuestions: "Self-check questions",
+      socialLuck: "Social flow",
+      socialPersonality: "Social personality",
       currentPhase: "Current phase",
       whatToFocusOn: "What to focus on",
       whatToAvoid: "What to avoid",
@@ -183,19 +206,25 @@ const RESULT_COPY = {
       thisYear: "This year",
       relationshipStyle: "Relationship style",
       loveStyle: "Love style",
+      affectionLuck: "Love and affection",
       matchingPeople: "Matching people",
       conflictPronePeople: "Conflict-prone people",
       longTermAdvice: "Long-term relationship advice",
+      workAptitude: "Social/work aptitude",
       workStyle: "Work style",
       suitableEnvironment: "Suitable environment",
       roleStrengths: "Role strengths",
+      moneyLuck: "Money flow",
       moneyMakingStyle: "Money-making style",
+      moneyProtection: "How to reduce money loss",
+      moneyStrategy: "How to gather money",
       moneyManagementCaution: "Money-management caution",
       whatToDoNow: "What to do now",
       whatToAvoidNow: "What to avoid now",
       relationshipGuidance: "Relationship guidance",
       workGuidance: "Work guidance",
       moneyGuidance: "Money guidance",
+      lifeRhythm: "Condition & daily rhythm",
       balanceRecoveryActions: "Balance recovery actions",
       profile: "Profile",
       rawFourPillars: "Raw four pillars table",
@@ -245,14 +274,12 @@ const RESULT_COPY = {
     sections: {
       summary: "要約",
       pillars: "四柱ビジュアルチャート",
-      balance: "バランス",
-      personality: "性格",
-      past: "過去のパターン",
-      current: "現在の流れ",
-      future: "今後の見通し",
-      relationships: "人間関係",
+      balance: "五行とバランス",
+      lifeFlow: "人生の流れ",
+      personality: "性格と生まれ持つ質",
+      socialLove: "社会と関係",
       workMoney: "仕事とお金",
-      guidance: "ガイダンス",
+      guidance: "今のガイダンス",
       technical: "技術詳細"
     },
     labels: {
@@ -265,10 +292,18 @@ const RESULT_COPY = {
       strongEnergy: "強い気",
       weakEnergy: "弱い気",
       balanceAdvice: "バランス助言",
+      lifelongOverview: "生涯の概要",
+      earlyYears: "若年期",
+      middleYears: "中年期",
+      laterYears: "晩年期",
+      currentFlow: "現在の流れ",
+      futureFlow: "これからの流れ",
       heavenlyStem: "天干",
       earthlyBranch: "地支",
       dayMaster: "日主",
       basicPersonality: "基本性格",
+      innateNature: "生まれ持つ傾向",
+      naturalCharacter: "自然な人柄",
       strengths: "強み",
       vulnerabilities: "弱点",
       thinkingStyle: "思考スタイル",
@@ -279,6 +314,8 @@ const RESULT_COPY = {
       relationshipPatterns: "関係パターン",
       workStudyPatterns: "仕事/学習パターン",
       selfCheckQuestions: "セルフチェック質問",
+      socialLuck: "社会運",
+      socialPersonality: "社会的性格",
       currentPhase: "現在の段階",
       whatToFocusOn: "集中すること",
       whatToAvoid: "避けること",
@@ -296,19 +333,25 @@ const RESULT_COPY = {
       thisYear: "今年",
       relationshipStyle: "関係スタイル",
       loveStyle: "愛情スタイル",
+      affectionLuck: "恋愛・愛情運",
       matchingPeople: "合いやすい人",
       conflictPronePeople: "衝突しやすい人",
       longTermAdvice: "長期関係の助言",
+      workAptitude: "社会・仕事適性",
       workStyle: "仕事スタイル",
       suitableEnvironment: "合う環境",
       roleStrengths: "役割の強み",
+      moneyLuck: "金運",
       moneyMakingStyle: "稼ぎ方",
+      moneyProtection: "損失を減らす方法",
+      moneyStrategy: "お金を集める方法",
       moneyManagementCaution: "お金管理の注意",
       whatToDoNow: "今すること",
       whatToAvoidNow: "今避けること",
       relationshipGuidance: "関係ガイド",
       workGuidance: "仕事ガイド",
       moneyGuidance: "お金ガイド",
+      lifeRhythm: "コンディションと生活リズム",
       balanceRecoveryActions: "バランス回復行動",
       profile: "プロフィール",
       rawFourPillars: "四柱原表",
@@ -358,14 +401,12 @@ const RESULT_COPY = {
     sections: {
       summary: "摘要",
       pillars: "四柱视觉图",
-      balance: "平衡",
-      personality: "性格",
-      past: "过去模式",
-      current: "当前流动",
-      future: "未来展望",
-      relationships: "关系",
+      balance: "五行与平衡",
+      lifeFlow: "人生流动",
+      personality: "性格与天性",
+      socialLove: "社会与关系",
       workMoney: "工作与金钱",
-      guidance: "指引",
+      guidance: "当前指引",
       technical: "技术细节"
     },
     labels: {
@@ -378,10 +419,18 @@ const RESULT_COPY = {
       strongEnergy: "较强能量",
       weakEnergy: "较弱能量",
       balanceAdvice: "平衡建议",
+      lifelongOverview: "人生总览",
+      earlyYears: "早年运",
+      middleYears: "中年运",
+      laterYears: "晚年运",
+      currentFlow: "当前流动",
+      futureFlow: "未来流动",
       heavenlyStem: "天干",
       earthlyBranch: "地支",
       dayMaster: "日主",
       basicPersonality: "基本性格",
+      innateNature: "天生倾向",
+      naturalCharacter: "自然品格",
       strengths: "优势",
       vulnerabilities: "脆弱点",
       thinkingStyle: "思考方式",
@@ -392,6 +441,8 @@ const RESULT_COPY = {
       relationshipPatterns: "关系模式",
       workStudyPatterns: "工作/学习模式",
       selfCheckQuestions: "自我检查问题",
+      socialLuck: "社会运",
+      socialPersonality: "社会性格",
       currentPhase: "当前阶段",
       whatToFocusOn: "需要专注",
       whatToAvoid: "需要避免",
@@ -409,19 +460,25 @@ const RESULT_COPY = {
       thisYear: "今年",
       relationshipStyle: "关系风格",
       loveStyle: "恋爱风格",
+      affectionLuck: "恋爱与情感",
       matchingPeople: "适合的人",
       conflictPronePeople: "容易冲突的人",
       longTermAdvice: "长期关系建议",
+      workAptitude: "社会/工作适性",
       workStyle: "工作方式",
       suitableEnvironment: "适合环境",
       roleStrengths: "角色优势",
+      moneyLuck: "财物流动",
       moneyMakingStyle: "赚钱方式",
+      moneyProtection: "减少财物损失的方法",
+      moneyStrategy: "积累金钱的方法",
       moneyManagementCaution: "金钱管理注意",
       whatToDoNow: "现在该做",
       whatToAvoidNow: "现在避免",
       relationshipGuidance: "关系指引",
       workGuidance: "工作指引",
       moneyGuidance: "金钱指引",
+      lifeRhythm: "状态与生活节奏",
       balanceRecoveryActions: "平衡恢复行动",
       profile: "资料",
       rawFourPillars: "原始四柱表",
@@ -500,7 +557,13 @@ function renderResult(record) {
   const result = typeof record.result_json === "string" ? JSON.parse(record.result_json) : record.result_json;
   const lang = getLanguage();
   const copy = getResultCopy(lang);
-  const narrative = buildNarrative(record, result, lang);
+  const analysis = result.analysis || buildDerivedAnalysis({
+    pillars: result.pillars,
+    hiddenStems: result.hiddenStems,
+    tenGods: result.tenGods,
+    yinYang: result.yinYang
+  });
+  const narrative = buildNarrative(record, result, analysis, lang);
   const country = getCountryName(record.birth_country, getLanguage());
   const branch = EARTHLY_BRANCHES.find((item) => item.key === record.birth_time_branch);
 
@@ -516,7 +579,7 @@ function renderResult(record) {
         ${metaItem(t("result.id"), record.slug, t("result.rememberId"))}
         ${metaItem(t("result.created"), formatDateTime(record.created_at))}
         ${metaItem(copy.labels.coreKeywords, narrative.coreKeywords.join(" · "))}
-        ${metaItem(copy.labels.currentLifeTheme, narrative.currentLifeTheme)}
+        ${metaItem(copy.labels.currentLifeTheme, narrative.lifeTheme)}
         ${metaItem(copy.labels.opportunityAreas, narrative.opportunityAreas.join(" · "))}
         ${metaItem(copy.labels.cautionAreas, narrative.cautionAreas.join(" · "))}
       </div>
@@ -534,7 +597,7 @@ function renderResult(record) {
       <div class="balance-grid">
         <div>
           <h3>${escapeHtml(copy.labels.fiveElements)}</h3>
-          ${renderMeters(result.fiveElements, "element")}
+          ${renderMeters(analysis.weightedElementCounts || result.fiveElements, "element")}
         </div>
         <div>
           <h3>${escapeHtml(copy.labels.yinYang)}</h3>
@@ -548,34 +611,19 @@ function renderResult(record) {
       </div>
     </section>
 
+    <section class="result-section" aria-labelledby="lifeFlowTitle">
+      <h2 id="lifeFlowTitle">${escapeHtml(copy.sections.lifeFlow)}</h2>
+      ${renderReadingBlocks(narrative.lifeFlow)}
+    </section>
+
     <section class="result-section" aria-labelledby="personalityTitle">
       <h2 id="personalityTitle">${escapeHtml(copy.sections.personality)}</h2>
       ${renderReadingBlocks(narrative.personality)}
     </section>
 
-    <section class="result-section" aria-labelledby="pastTitle">
-      <h2 id="pastTitle">${escapeHtml(copy.sections.past)}</h2>
-      ${renderReadingBlocks(narrative.past)}
-    </section>
-
-    <section class="result-section" aria-labelledby="currentTitle">
-      <h2 id="currentTitle">${escapeHtml(copy.sections.current)}</h2>
-      ${renderReadingBlocks(narrative.current)}
-    </section>
-
-    <section class="result-section" aria-labelledby="futureTitle">
-      <h2 id="futureTitle">${escapeHtml(copy.sections.future)}</h2>
-      ${renderReadingBlocks(narrative.future.blocks)}
-      <div class="tag-row-group">
-        ${tagGroup(copy.labels.opportunityTags, narrative.future.opportunityTags)}
-        ${tagGroup(copy.labels.riskTags, narrative.future.riskTags)}
-      </div>
-      ${renderTimeline(narrative.future.timeline)}
-    </section>
-
-    <section class="result-section" aria-labelledby="relationshipsTitle">
-      <h2 id="relationshipsTitle">${escapeHtml(copy.sections.relationships)}</h2>
-      ${renderReadingBlocks(narrative.relationships)}
+    <section class="result-section" aria-labelledby="socialLoveTitle">
+      <h2 id="socialLoveTitle">${escapeHtml(copy.sections.socialLove)}</h2>
+      ${renderReadingBlocks(narrative.socialLove)}
     </section>
 
     <section class="result-section" aria-labelledby="workMoneyTitle">
@@ -622,6 +670,7 @@ function renderResult(record) {
             <h3>${escapeHtml(copy.labels.assumptions)}</h3>
             <ul class="tag-list">
               ${result.warnings.map((warning) => `<li>${escapeHtml(warning)}</li>`).join("")}
+              <li>${escapeHtml(analysis.methodNote || "")}</li>
             </ul>
           </div>
           <div class="notice-stack">
@@ -793,13 +842,16 @@ function renderGanjiPart(part) {
   `;
 }
 
-function buildNarrative(record, result, lang) {
+function buildNarrative(record, result, analysis, lang) {
   const copy = getResultCopy(lang);
-  const strong = getRankedElements(result.fiveElements)[0]?.[0] || "earth";
-  const weak = getRankedElements(result.fiveElements).at(-1)?.[0] || "earth";
+  const rankedElements = analysis.rankedElements || getRankedElements(analysis.weightedElementCounts || result.fiveElements);
+  const strong = analysis.strongElements?.[0] || rankedElements[0]?.[0] || "earth";
+  const secondaryStrong = analysis.strongElements?.[1] || strong;
+  const weak = analysis.weakElements?.[0] || rankedElements.at(-1)?.[0] || "earth";
   const dayElement = result.pillars.day.stem.element;
   const dayYinYang = result.pillars.day.stem.yinYang;
-  const dominantPolarity = result.yinYang.yang >= result.yinYang.yin ? "yang" : "yin";
+  const dominantPolarity = analysis.dominantPolarity || (result.yinYang.yang >= result.yinYang.yin ? "yang" : "yin");
+  const dominantTenGod = (analysis.dominantTenGods || []).find((god) => god !== "self") || analysis.dominantTenGods?.[0] || "self";
   const currentYear = new Date().getFullYear();
   const nextYear = currentYear + 1;
   const threeYear = currentYear + 3;
@@ -807,78 +859,74 @@ function buildNarrative(record, result, lang) {
   const currentLuck = result.luckPillars.pillars.find((pillar) => currentAge >= pillar.startAge && currentAge <= pillar.endAge) || result.luckPillars.pillars[0];
   const day = elementText(copy, dayElement);
   const strongText = elementText(copy, strong);
+  const secondaryStrongText = elementText(copy, secondaryStrong);
   const weakText = elementText(copy, weak);
   const polarityText = copy.yinYang[dominantPolarity];
+  const dayPolarityText = copy.yinYang[dayYinYang];
+  const dominantTenGodText = t(`tenGod.${dominantTenGod}`);
   const keywords = unique([...copy.elementKeywords[dayElement], ...copy.elementKeywords[strong]]).slice(0, 5);
   const opportunityAreas = unique([...copy.opportunities[strong], ...copy.opportunities[dayElement]]).slice(0, 4);
   const cautionAreas = unique([...copy.cautions[weak], ...copy.polarityCautions[dominantPolarity]]).slice(0, 4);
 
   return {
     coreKeywords: keywords,
-    currentLifeTheme: copy.sentences.theme(day, strongText),
+    lifeTheme: copy.sentences.theme(day, strongText, dominantTenGodText),
     opportunityAreas,
     cautionAreas,
-    overall: copy.sentences.overall(day, strongText, weakText),
+    overall: copy.sentences.overall(day, strongText, weakText, dominantTenGodText),
     strongEnergy: copy.sentences.strong(strongText),
     weakEnergy: copy.sentences.weak(weakText),
     balanceAdvice: copy.sentences.balance(weakText, polarityText),
+    lifeFlow: [
+      block(copy.labels.lifelongOverview, copy.sentences.lifelongOverview(day, strongText, weakText, dominantTenGodText)),
+      block(copy.labels.earlyYears, copy.sentences.earlyYears(day, secondaryStrongText)),
+      block(copy.labels.middleYears, copy.sentences.middleYears(strongText, weakText)),
+      block(copy.labels.laterYears, copy.sentences.laterYears(day, weakText)),
+      block(copy.labels.currentFlow, copy.sentences.currentPhase(strongText, weakText)),
+      block(copy.labels.futureFlow, copy.sentences.futureFlow(currentYear, threeYear, weakText)),
+      block(copy.labels.tenYearLuckTheme, copy.sentences.luckTheme(currentLuck?.han || "", currentLuck?.ko || "", currentLuck?.startAge, currentLuck?.endAge))
+    ],
     personality: [
-      block(copy.labels.basicPersonality, copy.sentences.personality(day, copy.yinYang[dayYinYang])),
+      block(copy.labels.basicPersonality, copy.sentences.personality(day, dayPolarityText, dominantTenGodText)),
+      block(copy.labels.innateNature, copy.sentences.innateNature(day, strongText)),
+      block(copy.labels.naturalCharacter, copy.sentences.naturalCharacter(weakText, polarityText)),
       block(copy.labels.strengths, copy.sentences.strengths(strongText)),
       block(copy.labels.vulnerabilities, copy.sentences.vulnerabilities(weakText)),
       block(copy.labels.thinkingStyle, copy.sentences.thinking(day)),
-      block(copy.labels.actionStyle, copy.sentences.action(polarityText)),
-      block(copy.labels.emotionalExpression, copy.sentences.emotion(day, polarityText))
-    ],
-    past: [
-      block(copy.labels.repeatedPastPatterns, copy.sentences.pastPattern(strongText)),
-      block(copy.labels.earlyTemperament, copy.sentences.early(day)),
-      block(copy.labels.relationshipPatterns, copy.sentences.relationshipPast(polarityText)),
-      block(copy.labels.workStudyPatterns, copy.sentences.workStudy(strongText)),
+      block(copy.labels.emotionalExpression, copy.sentences.emotion(day, polarityText)),
       block(copy.labels.selfCheckQuestions, copy.selfCheckQuestions)
     ],
-    current: [
-      block(copy.labels.currentPhase, copy.sentences.currentPhase(strongText, weakText)),
-      block(copy.labels.whatToFocusOn, copy.sentences.focus(weakText)),
-      block(copy.labels.whatToAvoid, copy.sentences.avoid(strongText)),
-      block(copy.labels.relationshipPriority, copy.sentences.priority(copy.labels.relationship)),
-      block(copy.labels.workPriority, copy.sentences.priority(copy.labels.work)),
-      block(copy.labels.moneyPriority, copy.sentences.priority(copy.labels.money))
-    ],
-    future: {
-      blocks: [
-        block(copy.labels.thisYearNextYear, copy.sentences.yearFlow(currentYear, nextYear, strongText)),
-        block(copy.labels.nextThreeYears, copy.sentences.threeYears(currentYear, threeYear, weakText)),
-        block(copy.labels.tenYearLuckTheme, copy.sentences.luckTheme(currentLuck?.han || "", currentLuck?.ko || "", currentLuck?.startAge, currentLuck?.endAge))
-      ],
-      opportunityTags: opportunityAreas,
-      riskTags: cautionAreas,
-      timeline: [
-        { period: String(currentYear), title: copy.labels.thisYear, text: copy.sentences.timelineNow(strongText) },
-        { period: `${currentYear}-${threeYear}`, title: copy.labels.nextThreeYears, text: copy.sentences.timelineThree(weakText) },
-        { period: `${currentLuck?.startAge || ""}-${currentLuck?.endAge || ""}`, title: copy.labels.tenYearLuckTheme, text: copy.sentences.timelineLuck(currentLuck?.han || "") }
-      ]
-    },
-    relationships: [
+    socialLove: [
+      block(copy.labels.socialLuck, copy.sentences.socialLuck(strongText, dominantTenGodText)),
+      block(copy.labels.socialPersonality, copy.sentences.socialPersonality(polarityText, weakText)),
       block(copy.labels.relationshipStyle, copy.sentences.relationshipStyle(day)),
+      block(copy.labels.affectionLuck, copy.sentences.affectionLuck(polarityText, strongText)),
       block(copy.labels.loveStyle, copy.sentences.loveStyle(polarityText)),
       block(copy.labels.matchingPeople, copy.sentences.matchingPeople(weakText)),
       block(copy.labels.conflictPronePeople, copy.sentences.conflictPeople(strongText)),
       block(copy.labels.longTermAdvice, copy.sentences.longTermAdvice(weakText))
     ],
     workMoney: [
+      block(copy.labels.workAptitude, copy.sentences.workAptitude(strongText, dominantTenGodText)),
       block(copy.labels.workStyle, copy.sentences.workStyle(strongText)),
       block(copy.labels.suitableEnvironment, copy.sentences.environment(day)),
       block(copy.labels.roleStrengths, copy.sentences.roleStrengths(strongText)),
+      block(copy.labels.moneyLuck, copy.sentences.moneyLuck(strongText, weakText)),
       block(copy.labels.moneyMakingStyle, copy.sentences.moneyMaking(strongText)),
+      block(copy.labels.moneyStrategy, copy.sentences.moneyStrategy(dominantTenGodText, weakText)),
+      block(copy.labels.moneyProtection, copy.sentences.moneyProtection(weakText)),
       block(copy.labels.moneyManagementCaution, copy.sentences.moneyCaution(weakText))
     ],
     guidance: [
       block(copy.labels.whatToDoNow, copy.sentences.doNow(weakText)),
       block(copy.labels.whatToAvoidNow, copy.sentences.avoidNow(strongText)),
+      block(copy.labels.whatToFocusOn, copy.sentences.focus(weakText)),
       block(copy.labels.relationshipGuidance, copy.sentences.relationshipGuidance(weakText)),
       block(copy.labels.workGuidance, copy.sentences.workGuidance(strongText)),
       block(copy.labels.moneyGuidance, copy.sentences.moneyGuidance(weakText)),
+      block(copy.labels.lifeRhythm, copy.sentences.lifeRhythm(weakText, polarityText)),
+      block(copy.labels.opportunityTags, opportunityAreas),
+      block(copy.labels.riskTags, cautionAreas),
       block(copy.labels.balanceRecoveryActions, copy.recoveryActions[weak])
     ]
   };
@@ -906,12 +954,19 @@ function getResultCopy(lang) {
 
 function koreanSentences() {
   return sentenceSet({
-    theme: "{day} 일간이 {strong} 기운으로 드러납니다. 지금은 방향을 넓히기보다 리듬을 정돈하는 시기입니다.",
-    overall: "{day} 성향 위에 {strong} 기운이 두드러지고, {weak}을 보완할 때 균형이 좋아집니다.",
+    theme: "{day} 일간이 {strong} 기운과 {god} 흐름을 통해 드러납니다. 지금은 방향을 넓히기보다 자신에게 맞는 리듬과 기준을 정돈하는 시기입니다.",
+    overall: "{day} 성향 위에 {strong} 기운이 두드러지고 {god} 흐름이 반복됩니다. {weak}을 의식적으로 보완하면 관계, 일, 돈의 판단이 더 차분해집니다.",
     strong: "{element} 기운이 비교적 강합니다. 장점으로 쓰이면 추진력과 반복 가능한 패턴이 됩니다.",
     weak: "{element} 기운은 상대적으로 약합니다. 결핍이 아니라 의식적으로 빌려오면 균형을 만드는 지점입니다.",
     balance: "{weak}의 행동을 작게 실천하고, {polarity} 리듬이 한쪽으로 치우치지 않게 조절해 보세요.",
-    personality: "{day} 일간과 {polarity} 성향이 함께 나타납니다. 스스로 납득할 수 있는 방식에서 안정감이 생깁니다.",
+    lifelongOverview: "이 명식은 {day}의 기본 성향 위에 {strong}의 사용감이 강하게 얹혀 있습니다. 평생의 큰 과제는 잘하는 방식을 반복하되 {weak}이 비는 순간을 알아차리는 것입니다. {god} 흐름은 사람과 일 사이에서 자주 쓰는 생존 전략처럼 나타날 수 있습니다.",
+    earlyYears: "초년에는 {day} 특유의 기준감과 {strong}의 반응이 함께 올라옵니다. 칭찬이나 기대에 빨리 반응하지만, 흥미가 분산되면 시작한 일을 끝까지 밀고 가는 데 시간이 걸릴 수 있습니다.",
+    middleYears: "중년에는 {strong}을 현실적인 성과로 바꾸는 힘이 커집니다. 다만 {weak}을 돌보지 않으면 관계 피로, 판단 지연, 과도한 책임감처럼 느껴질 수 있어 생활 리듬과 관계의 경계를 함께 점검하는 편이 좋습니다.",
+    laterYears: "말년으로 갈수록 {day}의 기준은 더 선명해집니다. {weak}을 회복하는 습관이 있으면 경험이 고집이 아니라 지혜로 정리되고, 주변 사람에게 안정감을 주는 역할로 이어질 수 있습니다.",
+    futureFlow: "{year}년부터 {threeYear}년까지는 {weak}을 보완하는 선택이 오래 갑니다. 큰 변화 하나보다 작은 습관을 꾸준히 가져가는 쪽이 흐름을 안정시킵니다.",
+    personality: "{day} 일간과 {polarity} 성향, 그리고 {god} 흐름이 함께 나타납니다. 스스로 납득할 수 있는 방식에서 안정감이 생기며, 명확한 이유가 있을 때 더 오래 움직입니다.",
+    innateNature: "타고난 결은 {day}의 관찰 방식과 {strong}의 실행감에 가깝습니다. 겉으로 단순해 보여도 속으로는 기준을 세우고, 상황의 맥락을 읽은 뒤 움직이려는 경향이 있습니다.",
+    naturalCharacter: "인품 면에서는 {weak}을 의식할 때 부드러움이 살아납니다. {polarity} 리듬이 강해질수록 혼자 판단하거나 혼자 참기 쉬우니, 감정과 요청을 작게라도 표현하는 것이 좋습니다.",
     strengths: "{strong} 기운은 반복과 축적 속에서 강점이 됩니다. 잘하는 방식을 시스템으로 만들수록 힘이 납니다.",
     vulnerabilities: "{weak} 영역은 무리하게 밀어붙이기보다 작은 루틴으로 보완하는 편이 좋습니다.",
     thinking: "{day}의 관점으로 정보를 해석합니다. 빠른 답보다 스스로 정리한 기준이 더 오래 갑니다.",
@@ -931,32 +986,47 @@ function koreanSentences() {
     timelineNow: "{strong} 강점을 정돈해 눈에 보이는 결과로 만드는 시기입니다.",
     timelineThree: "{weak} 보완이 다음 선택의 안정성을 높입니다.",
     timelineLuck: "{pillar} 대운은 장기 배경음처럼 작동하는 흐름입니다.",
+    socialLuck: "사회운은 {strong}을 어떻게 사람들 사이에서 쓰느냐에 달려 있습니다. {god} 흐름이 강하게 보일 때는 인정받고 싶은 방식, 책임을 맡는 방식, 도움을 주고받는 방식이 반복 패턴이 됩니다.",
+    socialPersonality: "사회적 성격은 {polarity} 리듬을 띱니다. {weak}이 부족할 때는 상대의 속도와 내 속도가 어긋날 수 있으므로, 처음부터 기대치와 역할을 말로 맞추는 편이 좋습니다.",
     relationshipStyle: "{day} 성향은 관계에서 신뢰할 수 있는 리듬을 찾으려 합니다.",
+    affectionLuck: "애정운은 {polarity} 리듬과 {strong}의 표현 방식이 함께 작동합니다. 마음이 있어도 표현 방식이 일정하지 않으면 오해가 생길 수 있어, 관심과 거리감을 꾸준히 조율하는 것이 좋습니다.",
     loveStyle: "애정 표현은 {polarity} 리듬을 타기 쉽습니다. 상대가 이해할 수 있는 속도로 표현하는 것이 좋습니다.",
     matchingPeople: "{weak} 기운을 자연스럽게 보완해 주는 사람과 함께할 때 시야가 넓어집니다.",
     conflictPeople: "{strong} 기운이 지나치게 비슷하거나 강한 사람과는 주도권 충돌이 생길 수 있습니다.",
     longTermAdvice: "장기 관계에서는 {weak} 영역을 함께 회복하는 습관이 중요합니다.",
+    workAptitude: "사회·직업 적성은 {strong}을 실제 성과로 바꾸는 일에서 살아납니다. {god} 흐름은 역할을 맡는 방식의 힌트가 되며, 특정 직업명보다 반복해서 잘 쓰는 능력을 보는 편이 안전합니다.",
     workStyle: "{strong} 기운을 쓸 수 있는 역할에서 몰입이 잘 생깁니다.",
     environment: "{day} 성향이 존중되는 환경, 즉 기준과 자율성이 함께 있는 곳이 잘 맞습니다.",
     roleStrengths: "{strong}을 구조화하는 역할에서 신뢰를 얻기 쉽습니다.",
+    moneyLuck: "재물운은 {strong}을 꾸준한 가치로 만들 때 열립니다. {weak}이 비어 있을 때는 돈의 흐름을 감으로 처리하기보다 기록, 기준, 확인 절차를 두는 편이 안정적입니다.",
     moneyMaking: "돈은 {strong} 강점을 꾸준한 가치로 바꿀 때 들어오기 쉽습니다.",
+    moneyStrategy: "재물을 모으는 법은 {god} 흐름을 무리하게 키우기보다 {weak}을 보완하는 시스템을 만드는 것입니다. 수입보다 먼저 반복 가능한 관리 방식이 잡히면 작은 운도 오래 머뭅니다.",
+    moneyProtection: "재물 손실을 줄이려면 {weak} 영역의 빈틈을 점검하세요. 즉흥적인 약속, 모호한 계약, 감정적 지출처럼 확인이 부족한 곳에서 새는 돈을 먼저 막는 것이 좋습니다.",
     moneyCaution: "{weak} 영역이 약할 때는 감정적 소비나 불명확한 약속을 조심하세요.",
     doNow: "지금은 {weak} 기운을 하루 한 번 회복하는 행동을 정하세요.",
     avoidNow: "{strong}의 익숙함에만 기대어 결정을 서두르지 마세요.",
     relationshipGuidance: "관계에서는 {weak} 기운을 빌려 듣고 확인하는 시간을 두세요.",
     workGuidance: "일에서는 {strong} 강점을 결과물의 형태로 정리하세요.",
-    moneyGuidance: "돈에서는 {weak} 영역을 보완하는 기록과 점검이 필요합니다."
+    moneyGuidance: "돈에서는 {weak} 영역을 보완하는 기록과 점검이 필요합니다.",
+    lifeRhythm: "컨디션은 의학적 판단이 아니라 생활 리듬의 관점에서만 보세요. {weak}이 비고 {polarity} 리듬이 강해질 때는 수면, 식사, 움직임, 휴식 시간을 먼저 일정하게 만드는 것이 좋습니다."
   });
 }
 
 function englishSentences() {
   return sentenceSet({
-    theme: "Your {day} Day Master is expressed through prominent {strong} energy. This phase asks you to refine rhythm before widening direction.",
-    overall: "This chart rests on {day}, shows noticeable {strong}, and becomes steadier when {weak} is practiced intentionally.",
+    theme: "Your {day} Day Master is expressed through prominent {strong} energy and a recurring {god} pattern. This phase asks you to refine rhythm and standards before widening direction.",
+    overall: "This chart rests on {day}, shows noticeable {strong}, and often repeats a {god} pattern. When {weak} is practiced intentionally, judgment around relationships, work, and money becomes steadier.",
     strong: "{element} is relatively strong. Used well, it becomes momentum and a repeatable pattern of strength.",
     weak: "{element} is relatively quiet. This is not a flaw; it is a useful place to borrow balance from.",
     balance: "Practice small {weak} actions and keep the {polarity} rhythm from taking over the whole pace.",
-    personality: "{day} and {polarity} tendencies meet here. You may feel most stable when your actions make sense internally.",
+    lifelongOverview: "This chart places {strong} strongly on top of a {day} base. The lifelong theme is to keep using what works while noticing where {weak} goes missing. The {god} pattern may show up as a familiar strategy in work, relationships, and self-protection.",
+    earlyYears: "Early life may show the standards of {day} and the responsiveness of {strong}. Praise and expectations can motivate you quickly, but scattered interest may make finishing harder than starting.",
+    middleYears: "Midlife favors turning {strong} into visible results. If {weak} is neglected, relationship fatigue, delayed decisions, or too much responsibility may build up, so boundaries and routines matter.",
+    laterYears: "Later life can make the standards of {day} clearer. When {weak} is restored as a habit, experience becomes wisdom rather than rigidity.",
+    futureFlow: "From {year} to {threeYear}, choices that restore {weak} are likely to last longer. Small repeatable habits matter more than one dramatic change.",
+    personality: "{day}, {polarity} rhythm, and the {god} pattern meet here. You may feel most stable when your actions make sense internally and when there is a clear reason to continue.",
+    innateNature: "Your innate nature leans toward the perception of {day} and the working style of {strong}. Even when you look simple on the outside, you may be setting standards and reading context inside.",
+    naturalCharacter: "Your character becomes softer when {weak} is consciously practiced. When the {polarity} rhythm intensifies, avoid deciding or enduring everything alone.",
     strengths: "{strong} becomes a strength through repetition and accumulation. Your gift grows when your method becomes a system.",
     vulnerabilities: "{weak} may need small routines rather than force. Gentle structure works better than pressure.",
     thinking: "You tend to interpret information through a {day} lens. A self-owned standard lasts longer than a quick answer.",
@@ -976,32 +1046,47 @@ function englishSentences() {
     timelineNow: "Shape your {strong} strength into visible outcomes.",
     timelineThree: "Restoring {weak} makes the next choices steadier.",
     timelineLuck: "{pillar} works like a long-term background rhythm.",
+    socialLuck: "Social flow depends on how {strong} is used among people. When {god} is prominent, the way you seek recognition, take responsibility, or exchange help can become a repeated pattern.",
+    socialPersonality: "Your social personality carries a {polarity} rhythm. When {weak} is low, your pace and another person's pace may miss each other, so name expectations early.",
     relationshipStyle: "{day} seeks a reliable rhythm in relationships.",
+    affectionLuck: "Love and affection combine the {polarity} rhythm with the expression style of {strong}. Consistent signals matter more than intense but uneven expression.",
     loveStyle: "Love expression may follow a {polarity} rhythm. Express it at a pace another person can understand.",
     matchingPeople: "People who naturally bring {weak} may widen your perspective.",
     conflictPeople: "Conflict can arise with people whose {strong} energy is equally intense or overly similar.",
     longTermAdvice: "Long-term bonds benefit from shared habits that restore {weak}.",
+    workAptitude: "Work aptitude appears where {strong} can become practical output. The {god} pattern hints at how you take roles, but it is safer to read abilities than fixed job titles.",
     workStyle: "You may focus well in roles where {strong} can be used directly.",
     environment: "An environment that respects {day}, with both standards and autonomy, can fit well.",
     roleStrengths: "You can earn trust by turning {strong} into structure.",
+    moneyLuck: "Money flow opens when {strong} becomes steady value. When {weak} is quiet, records, standards, and review are better than relying on instinct alone.",
     moneyMaking: "Money tends to follow when {strong} becomes consistent value.",
+    moneyStrategy: "Gathering money means building a system around {weak} rather than overusing {god}. Small repeatable management habits help good timing stay longer.",
+    moneyProtection: "To reduce money loss, check the weak spots around {weak}: unclear promises, vague contracts, and emotional spending are worth slowing down.",
     moneyCaution: "When {weak} is neglected, be careful with emotional spending and vague promises.",
     doNow: "Choose one daily action that restores {weak}.",
     avoidNow: "Do not rush decisions by relying only on familiar {strong}.",
     relationshipGuidance: "In relationships, borrow {weak}: listen, confirm, and give space.",
     workGuidance: "At work, turn {strong} into a visible deliverable.",
-    moneyGuidance: "With money, records and review help restore {weak}."
+    moneyGuidance: "With money, records and review help restore {weak}.",
+    lifeRhythm: "Read condition only as a daily-rhythm cue, not medical guidance. When {weak} is low and the {polarity} rhythm is strong, steady sleep, meals, movement, and rest matter first."
   });
 }
 
 function japaneseSentences() {
   return sentenceSet({
-    theme: "{day}の日主が{strong}の気を通して表れています。今は方向を広げる前にリズムを整える時期です。",
-    overall: "{day}を土台に{strong}が目立ち、{weak}を意識して補うほど安定します。",
+    theme: "{day}の日主が{strong}の気と{god}の流れを通して表れています。今は方向を広げる前に、自分に合うリズムと基準を整える時期です。",
+    overall: "{day}を土台に{strong}が目立ち、{god}のパターンが繰り返されます。{weak}を意識して補うほど、関係・仕事・お金の判断が落ち着きます。",
     strong: "{element}の気が比較的強めです。うまく使うと推進力と再現性のある強みになります。",
     weak: "{element}の気は静かです。欠点ではなく、意識的に取り入れると均衡を作る場所です。",
     balance: "{weak}の小さな行動を実践し、{polarity}のリズムに偏りすぎないよう調整しましょう。",
-    personality: "{day}と{polarity}の傾向が交わります。自分が納得できる動き方に安定感があります。",
+    lifelongOverview: "この命式は{day}を土台に、{strong}の使い方が強く出ています。人生全体のテーマは、得意な方法を活かしながら{weak}が抜ける瞬間に気づくことです。{god}は仕事や関係でよく使う戦略として表れやすいでしょう。",
+    earlyYears: "若い時期は{day}の基準感と{strong}の反応が一緒に出ます。期待に応えやすい一方、興味が散ると始めるより続けることに時間がかかるかもしれません。",
+    middleYears: "中年期は{strong}を現実的な成果に変えやすい時期です。{weak}を放置すると、関係疲れや判断の遅れ、責任の抱え込みとして出やすいため、境界線と生活リズムが大切です。",
+    laterYears: "晩年に向かうほど{day}の基準は明確になります。{weak}を回復する習慣があると、経験は頑固さではなく知恵として整理されます。",
+    futureFlow: "{year}年から{threeYear}年までは、{weak}を補う選択が長く残ります。大きな変化より、小さな習慣を続ける方が流れを安定させます。",
+    personality: "{day}、{polarity}のリズム、そして{god}の流れが交わります。自分が納得できる動き方と、続ける理由があると安定します。",
+    innateNature: "生まれ持つ質は、{day}の見方と{strong}の実行感に近いです。外からは単純に見えても、内側では基準を作り、文脈を読んで動こうとします。",
+    naturalCharacter: "人柄は{weak}を意識すると柔らかさが出ます。{polarity}のリズムが強くなるほど、一人で判断したり耐えたりしすぎないことが大切です。",
     strengths: "{strong}は反復と蓄積で強みになります。方法を仕組みにすると力が出ます。",
     vulnerabilities: "{weak}は無理に押すより、小さな習慣で補うほうが合います。",
     thinking: "{day}の視点で情報を解釈しやすいです。早い答えより自分の基準が長く残ります。",
@@ -1021,32 +1106,47 @@ function japaneseSentences() {
     timelineNow: "{strong}の強みを見える成果に整える時期です。",
     timelineThree: "{weak}の回復が次の選択を安定させます。",
     timelineLuck: "{pillar}は長期的な背景リズムとして働きます。",
+    socialLuck: "社会運は{strong}を人の中でどう使うかに左右されます。{god}が強いと、認められ方、責任の持ち方、助け合い方が反復パターンになります。",
+    socialPersonality: "社会的性格には{polarity}のリズムがあります。{weak}が不足すると相手との速度がずれやすいため、期待値と役割を早めに言葉にしましょう。",
     relationshipStyle: "{day}は関係の中で信頼できるリズムを求めます。",
+    affectionLuck: "恋愛・愛情運は{polarity}のリズムと{strong}の表現が一緒に働きます。強さよりも、安定したサインが誤解を減らします。",
     loveStyle: "愛情表現は{polarity}のリズムを帯びます。相手に伝わる速度が大切です。",
     matchingPeople: "{weak}を自然に補う人といると視野が広がります。",
     conflictPeople: "{strong}が似すぎたり強すぎたりする相手とは衝突しやすいです。",
     longTermAdvice: "長期関係では{weak}を一緒に回復する習慣が役立ちます。",
+    workAptitude: "社会・仕事適性は{strong}を具体的な成果に変える場面で出ます。{god}は役割の取り方のヒントであり、職業名より繰り返し使う能力として見るのが安全です。",
     workStyle: "{strong}を直接使える役割で集中しやすいです。",
     environment: "{day}が尊重され、基準と自律性が両方ある環境が合います。",
     roleStrengths: "{strong}を構造化する役割で信頼を得やすいです。",
+    moneyLuck: "金運は{strong}を継続的な価値に変えると開きます。{weak}が静かな時は、感覚だけでなく記録・基準・確認を置くと安定します。",
     moneyMaking: "お金は{strong}を継続的な価値に変えると流れやすくなります。",
+    moneyStrategy: "お金を集めるには{god}を無理に強めるより、{weak}を補う仕組みを作ることです。小さな管理習慣が良い流れを長く留めます。",
+    moneyProtection: "損失を減らすには{weak}の抜けを確認しましょう。曖昧な約束、契約、感情的な支出は少し速度を落とす価値があります。",
     moneyCaution: "{weak}が不足するときは感情的な支出や曖昧な約束に注意しましょう。",
     doNow: "今は{weak}を一日一回回復する行動を決めましょう。",
     avoidNow: "{strong}の慣れだけで急いで決めないようにしましょう。",
     relationshipGuidance: "関係では{weak}を借りて、聞く・確認する時間を持ちましょう。",
     workGuidance: "仕事では{strong}を見える成果物に整えましょう。",
-    moneyGuidance: "お金では記録と確認が{weak}を補います。"
+    moneyGuidance: "お金では記録と確認が{weak}を補います。",
+    lifeRhythm: "コンディションは医学的判断ではなく生活リズムの手がかりとして読んでください。{weak}が不足し{polarity}のリズムが強い時は、睡眠・食事・動き・休息を一定にすることが先です。"
   });
 }
 
 function chineseSentences() {
   return sentenceSet({
-    theme: "{day}日主正通过{strong}之气显现。当前主题是先整理节奏，再扩大方向。",
-    overall: "此盘以{day}为基础，{strong}较明显；有意识补充{weak}时，整体更平衡。",
+    theme: "{day}日主通过{strong}之气与{god}模式显现。当前主题是先整理适合自己的节奏与标准，再扩大方向。",
+    overall: "此盘以{day}为基础，{strong}较明显，也容易重复{god}模式；有意识补充{weak}时，关系、工作与金钱判断会更稳定。",
     strong: "{element}之气相对较强。善用时，会成为推动力和可重复的优势。",
     weak: "{element}之气相对安静。这不是缺陷，而是可以借力取得平衡的位置。",
     balance: "用小行动练习{weak}，同时避免{polarity}节奏过度主导。",
-    personality: "{day}与{polarity}倾向交会。按自己能理解的方式行动时，会更稳定。",
+    lifelongOverview: "这个命盘以{day}为底色，{strong}的使用感较强。人生主题是持续使用擅长的方法，同时看见{weak}缺席的时刻。{god}可能像一种熟悉的生存策略，出现在工作、关系与自我保护中。",
+    earlyYears: "早年容易呈现{day}的标准感与{strong}的反应力。称赞和期待能带来动力，但兴趣分散时，完成可能比开始更需要时间。",
+    middleYears: "中年适合把{strong}转化为现实成果。若忽略{weak}，可能表现为关系疲劳、判断延迟或责任过重，因此边界与生活节奏很重要。",
+    laterYears: "晚年阶段，{day}的标准会更清楚。若养成恢复{weak}的习惯，经验会变成智慧，而不是固执。",
+    futureFlow: "{year}到{threeYear}年，补充{weak}的选择更容易留下来。比起一次巨大改变，小而稳定的习惯更能稳住流动。",
+    personality: "{day}、{polarity}节奏与{god}模式交会。按自己能理解的方式行动，并知道为什么要继续时，会更稳定。",
+    innateNature: "天生倾向接近{day}的观察方式与{strong}的行动感。外表可能简单，内在却常在建立标准、读取情境后再行动。",
+    naturalCharacter: "品格在有意识练习{weak}时更柔和。{polarity}节奏增强时，请避免什么都独自判断或独自忍耐。",
     strengths: "{strong}通过重复和累积成为优势。把方法变成系统时，力量会更清楚。",
     vulnerabilities: "{weak}领域更适合用小习惯补充，而不是强行推进。",
     thinking: "你容易用{day}的视角解释信息。自己的标准比快速答案更持久。",
@@ -1066,33 +1166,48 @@ function chineseSentences() {
     timelineNow: "把{strong}优势整理成可见结果。",
     timelineThree: "恢复{weak}会让之后的选择更稳。",
     timelineLuck: "{pillar}像长期背景节奏一样发挥作用。",
+    socialLuck: "社会运取决于如何在人群中使用{strong}。当{god}明显时，被认可的方式、承担责任的方式、互相帮助的方式会形成重复模式。",
+    socialPersonality: "社会性格带有{polarity}节奏。{weak}不足时，你的速度与他人的速度可能错开，因此早一点说明期待和角色会更好。",
     relationshipStyle: "{day}在关系中寻找可信赖的节奏。",
+    affectionLuck: "恋爱与情感结合了{polarity}节奏和{strong}表达方式。稳定的信号比强烈但不均匀的表达更重要。",
     loveStyle: "爱的表达带有{polarity}节奏。用对方能理解的速度表达会更好。",
     matchingPeople: "能自然补充{weak}的人，会让你的视野更宽。",
     conflictPeople: "{strong}过于相似或过强的人，容易产生主导权冲突。",
     longTermAdvice: "长期关系需要一起恢复{weak}的习惯。",
+    workAptitude: "社会/工作适性出现在能把{strong}转化为现实成果的场景。{god}提示你承担角色的方式，宜看作能力倾向，而不是固定职业名称。",
     workStyle: "能直接使用{strong}的角色，容易带来专注。",
     environment: "尊重{day}，同时有标准与自主性的环境较适合。",
     roleStrengths: "把{strong}结构化的角色，容易获得信任。",
+    moneyLuck: "财物流动在{strong}变成稳定价值时打开。{weak}较弱时，请用记录、标准和复盘代替单凭感觉处理金钱。",
     moneyMaking: "当{strong}变成持续价值时，金钱更容易流入。",
+    moneyStrategy: "积累金钱不是过度使用{god}，而是围绕{weak}建立系统。小而可重复的管理习惯会让好运停留更久。",
+    moneyProtection: "减少财物损失，请检查{weak}相关的漏洞：模糊承诺、不清楚的合约、情绪消费都值得放慢确认。",
     moneyCaution: "{weak}被忽略时，请注意情绪消费和模糊承诺。",
     doNow: "现在请选择一个每天恢复{weak}的小行动。",
     avoidNow: "不要只依赖熟悉的{strong}而急着决定。",
     relationshipGuidance: "关系中请借用{weak}：倾听、确认、留空间。",
     workGuidance: "工作中请把{strong}整理成可见成果。",
-    moneyGuidance: "金钱方面，记录和复盘能补充{weak}。"
+    moneyGuidance: "金钱方面，记录和复盘能补充{weak}。",
+    lifeRhythm: "状态只作为生活节奏提示，不作为医学判断。{weak}不足且{polarity}节奏较强时，请先稳定睡眠、饮食、活动与休息。"
   });
 }
 
 function sentenceSet(templates) {
   const fill = (key, values) => renderTemplate(templates[key], values);
   return {
-    theme: (day, strong) => fill("theme", { day, strong }),
-    overall: (day, strong, weak) => fill("overall", { day, strong, weak }),
+    theme: (day, strong, god) => fill("theme", { day, strong, god }),
+    overall: (day, strong, weak, god) => fill("overall", { day, strong, weak, god }),
     strong: (element) => fill("strong", { element }),
     weak: (element) => fill("weak", { element }),
     balance: (weak, polarity) => fill("balance", { weak, polarity }),
-    personality: (day, polarity) => fill("personality", { day, polarity }),
+    lifelongOverview: (day, strong, weak, god) => fill("lifelongOverview", { day, strong, weak, god }),
+    earlyYears: (day, strong) => fill("earlyYears", { day, strong }),
+    middleYears: (strong, weak) => fill("middleYears", { strong, weak }),
+    laterYears: (day, weak) => fill("laterYears", { day, weak }),
+    futureFlow: (year, threeYear, weak) => fill("futureFlow", { year, threeYear, weak }),
+    personality: (day, polarity, god) => fill("personality", { day, polarity, god }),
+    innateNature: (day, strong) => fill("innateNature", { day, strong }),
+    naturalCharacter: (weak, polarity) => fill("naturalCharacter", { weak, polarity }),
     strengths: (strong) => fill("strengths", { strong }),
     vulnerabilities: (weak) => fill("vulnerabilities", { weak }),
     thinking: (day) => fill("thinking", { day }),
@@ -1112,21 +1227,29 @@ function sentenceSet(templates) {
     timelineNow: (strong) => fill("timelineNow", { strong }),
     timelineThree: (weak) => fill("timelineThree", { weak }),
     timelineLuck: (pillar) => fill("timelineLuck", { pillar }),
+    socialLuck: (strong, god) => fill("socialLuck", { strong, god }),
+    socialPersonality: (polarity, weak) => fill("socialPersonality", { polarity, weak }),
     relationshipStyle: (day) => fill("relationshipStyle", { day }),
+    affectionLuck: (polarity, strong) => fill("affectionLuck", { polarity, strong }),
     loveStyle: (polarity) => fill("loveStyle", { polarity }),
     matchingPeople: (weak) => fill("matchingPeople", { weak }),
     conflictPeople: (strong) => fill("conflictPeople", { strong }),
     longTermAdvice: (weak) => fill("longTermAdvice", { weak }),
+    workAptitude: (strong, god) => fill("workAptitude", { strong, god }),
     workStyle: (strong) => fill("workStyle", { strong }),
     environment: (day) => fill("environment", { day }),
     roleStrengths: (strong) => fill("roleStrengths", { strong }),
+    moneyLuck: (strong, weak) => fill("moneyLuck", { strong, weak }),
     moneyMaking: (strong) => fill("moneyMaking", { strong }),
+    moneyStrategy: (god, weak) => fill("moneyStrategy", { god, weak }),
+    moneyProtection: (weak) => fill("moneyProtection", { weak }),
     moneyCaution: (weak) => fill("moneyCaution", { weak }),
     doNow: (weak) => fill("doNow", { weak }),
     avoidNow: (strong) => fill("avoidNow", { strong }),
     relationshipGuidance: (weak) => fill("relationshipGuidance", { weak }),
     workGuidance: (strong) => fill("workGuidance", { strong }),
-    moneyGuidance: (weak) => fill("moneyGuidance", { weak })
+    moneyGuidance: (weak) => fill("moneyGuidance", { weak }),
+    lifeRhythm: (weak, polarity) => fill("lifeRhythm", { weak, polarity })
   };
 }
 
@@ -1144,11 +1267,15 @@ function renderMeters(counts, prefix) {
         <div class="meter-row">
           <strong>${escapeHtml(t(`${prefix}.${key}`))}</strong>
           <span class="meter-track"><span class="meter-fill" style="width: ${(value / total) * 100}%"></span></span>
-          <span>${value}</span>
+          <span>${formatCount(value)}</span>
         </div>
       `).join("")}
     </div>
   `;
+}
+
+function formatCount(value) {
+  return Number.isInteger(value) ? String(value) : Number(value).toFixed(1);
 }
 
 function metaItem(label, value, note = "") {

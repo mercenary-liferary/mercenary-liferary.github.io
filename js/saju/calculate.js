@@ -5,6 +5,7 @@ import { getDayPillar, getHourPillar, getMonthPillar, getYearPillar } from "./pi
 import { buildHiddenStemSummary } from "./hiddenStems.js";
 import { buildTenGodSummary } from "./tenGods.js";
 import { calculateLuckPillars } from "./luckPillars.js";
+import { buildDerivedAnalysis } from "./analysis.js";
 
 export function calculateSaju(input) {
   const country = getCountry(input.birthCountry);
@@ -33,6 +34,7 @@ export function calculateSaju(input) {
   const hiddenStems = buildHiddenStemSummary(pillars);
   const fiveElements = countFiveElements(pillars);
   const yinYang = countYinYang(pillars);
+  const analysis = buildDerivedAnalysis({ pillars, hiddenStems, tenGods, yinYang });
   const luckPillars = calculateLuckPillars({
     gender: input.gender,
     yearStemIndex: year.stemIndex,
@@ -62,6 +64,7 @@ export function calculateSaju(input) {
     hiddenStems,
     fiveElements,
     yinYang,
+    analysis,
     luckPillars,
     warnings: [
       ...normalized.warnings,
@@ -127,7 +130,40 @@ export function runValidationSamples() {
     };
   });
 
-  return [...yearResults, ...monthSamples, ...hourSamples];
+  const fullPillarSamples = [
+    {
+      label: "1991-05-23 KR 午 sample",
+      input: {
+        ...sample(1991, 5, 23),
+        birthTimeBranch: "wu",
+        birthCountry: "KR"
+      },
+      expectedYearPillar: "辛未",
+      expectedMonthPillar: "癸巳",
+      expectedDayPillar: "癸巳",
+      expectedHourPillar: "戊午"
+    }
+  ].map(({ label, input, expectedYearPillar, expectedMonthPillar, expectedDayPillar, expectedHourPillar }) => {
+    const result = calculateSaju(input);
+    return {
+      label,
+      expectedYearPillar,
+      actualYearPillar: result.pillars.year.han,
+      expectedMonthPillar,
+      actualMonthPillar: result.pillars.month.han,
+      expectedDayPillar,
+      actualDayPillar: result.pillars.day.han,
+      expectedHourPillar,
+      actualHourPillar: result.pillars.hour.han,
+      pass:
+        result.pillars.year.han === expectedYearPillar &&
+        result.pillars.month.han === expectedMonthPillar &&
+        result.pillars.day.han === expectedDayPillar &&
+        result.pillars.hour.han === expectedHourPillar
+    };
+  });
+
+  return [...yearResults, ...monthSamples, ...hourSamples, ...fullPillarSamples];
 }
 
 function countFiveElements(pillars) {

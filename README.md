@@ -166,7 +166,8 @@ This MVP is intentionally honest about calculation limits.
 - Night-rat-hour handling is not implemented.
 - The day-pillar base date should be verified against multiple professional Manse calendar samples.
 - Five elements count visible stems and branches equally.
-- Hidden stems are listed but not weighted.
+- Result narratives also use an MVP weighted helper analysis that adds small hidden-stem weights and month-season emphasis for more readable interpretation.
+- Hidden-stem weights are simple fixed MVP weights, not a professional strength model.
 - Luck pillar start age uses approximate solar terms and a representative hour for the selected time branch.
 - Different schools may use different standards, so professional Manse calendar results may differ.
 
