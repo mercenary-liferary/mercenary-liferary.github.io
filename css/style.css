@@ -289,12 +289,15 @@ h3 {
 
 .form-grid {
   display: grid;
+  align-items: start;
   gap: 18px;
 }
 
 .field {
   display: grid;
+  align-content: start;
   gap: 8px;
+  min-width: 0;
 }
 
 .field label,
@@ -1016,14 +1019,17 @@ h3 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .date-fields,
   .consent-block,
   .form-actions {
     grid-column: 1 / -1;
   }
 
   .date-inputs {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .date-inputs label:first-child {
+    grid-column: 1 / -1;
   }
 
   .form-actions {
