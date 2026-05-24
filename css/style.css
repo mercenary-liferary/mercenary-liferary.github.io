@@ -334,6 +334,9 @@ h3 {
 }
 
 .tool-panel {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
   padding: clamp(18px, 4vw, 32px);
 }
 
@@ -1074,20 +1077,8 @@ h3 {
     padding-top: 48px;
   }
 
-  .form-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .consent-block,
   .form-actions {
-    grid-column: 1 / -1;
-  }
-
-  .date-inputs {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .date-inputs label:first-child {
     grid-column: 1 / -1;
   }
 
