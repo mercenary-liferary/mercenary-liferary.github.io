@@ -73,8 +73,8 @@ SELECT
 FROM saju_results
 WHERE deleted_at IS NULL;
 
--- No public UPDATE or DELETE policy is created. Soft deletion is handled only
--- by the Supabase Edge Function using the service role key.
+-- No public UPDATE or DELETE policy is created. Deletion is handled only by the
+-- Supabase Edge Function using the service role key.
 --
 -- Browser clients can INSERT into the source table, but they read only through
 -- public_saju_results, which excludes password_hash.

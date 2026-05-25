@@ -110,8 +110,7 @@ export async function deleteResult(slug, password) {
     const record = JSON.parse(raw);
     const valid = await verifyPassword(password, record.password_hash);
     if (!valid) throw new StorageError("Invalid password.", "INVALID_PASSWORD");
-    record.deleted_at = new Date().toISOString();
-    localStorage.setItem(MOCK_PREFIX + normalizedSlug, JSON.stringify(record));
+    localStorage.removeItem(MOCK_PREFIX + normalizedSlug);
     return true;
   }
 

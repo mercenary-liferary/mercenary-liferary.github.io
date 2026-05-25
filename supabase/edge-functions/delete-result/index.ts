@@ -60,13 +60,13 @@ Deno.serve(async (request) => {
     return json({ error: "Invalid password" }, 403);
   }
 
-  const { error: updateError } = await supabase
+  const { error: deleteError } = await supabase
     .from("saju_results")
-    .update({ deleted_at: new Date().toISOString() })
+    .delete()
     .eq("slug", slug)
     .is("deleted_at", null);
 
-  if (updateError) {
+  if (deleteError) {
     return json({ error: "Delete failed" }, 500);
   }
 

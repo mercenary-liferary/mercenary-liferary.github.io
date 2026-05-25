@@ -99,7 +99,14 @@ The function accepts:
 }
 ```
 
-It verifies the stored password hash and sets `deleted_at`, instead of physically deleting the row.
+It verifies the stored password hash and physically deletes the row so the same Life ID can be reused.
+
+If your database already has rows that were previously soft-deleted, run this once in the Supabase SQL editor to free those Life IDs:
+
+```sql
+DELETE FROM saju_results
+WHERE deleted_at IS NOT NULL;
+```
 
 ## Environment And Config Variables
 
@@ -116,7 +123,7 @@ Do not commit service-role keys.
 
 - Plain text passwords are never stored.
 - The MVP hashes deletion passwords in the browser with PBKDF2-SHA256 and stores the hash.
-- The delete Edge Function recomputes the PBKDF2 hash and soft-deletes the row when it matches.
+- The delete Edge Function recomputes the PBKDF2 hash and deletes the row when it matches.
 - This avoids plain-text storage, but server-side hashing is still preferred.
 - Future production work should add a `create-result` Edge Function and hash passwords server-side with bcrypt or argon2.
 - The SQL grants public SELECT only on non-sensitive columns and excludes `password_hash`.
